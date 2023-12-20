@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: alphabeam
+    database: alphabeam
+    schema: Alphabeam_Project
+    tables:
+      - name: Customers
+        description: This contains the details of the customers
+      - name: ProductCategory
+        description: This contains the details of the product categories
+      - name: ProductSubcategory
+        description: This contains the details of the product subcategory
+      - name: Products
+        description: This contains the details of the products
+      - name: Sales
+        description: These are records of the product sales
