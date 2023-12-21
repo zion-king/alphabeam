@@ -1,0 +1,86 @@
+MetricFlow few-shot examples to assist LLM in query generation:
+
+Requirement: Get single metric organized by a single category from the same table
+SQL Logic: Query a single measure Grouped by a single dimension from the same table
+MetricFlow query command: query --metrics revenue_total --group-by sales_key__order_date
+measure: revenue_total; 
+dimension: order_date; 
+Table primary key: sales_key
+
+
+Requirement: Get single metric organized by a multiple categories from the same table
+SQL Logic: Query a single measure Grouped by multiple dimensions from the same table
+MetricFlow query command: query --metrics revenue_total --group-by sales_key__order_date,sales_key__sales_order_number
+measures: revenue_total; 
+dimensions: order_date, sales_order_number; 
+Table primary key: sales_key
+
+
+Requirement: Get multiple metrics organized by a multiple categories from the same table
+SQL Logic: Query multiple measures Grouped by multiple dimensions from the same table
+MetricFlow query command: query --metrics revenue_total,quantity_total,revenue_average --group-by sales_key__order_date,sales_key__sales_order_number
+measure: revenue_total,quantity_total,revenue_average; 
+dimensions: order_date,sales_order_number; 
+Table primary key: sales_key
+
+
+Requirement: Get single metric filtered and organized by multiple categories from the same table
+SQL Logic: Query single measures Grouped by multiple dimensions from the same table WHERE a condition is met
+MetricFlow query command: query --metrics revenue_total,quantity_total,revenue_average --group-by sales_key__order_date,sales_key__sales_order_line_number --where "sales_key__sales_order_line_number = 6"
+measure: revenue_total,quantity_total,revenue_average; 
+dimensions: order_date,sales_order_number; 
+Table primary key: sales_key; 
+WHERE condition: sales_order_line_number = 6;
+
+
+Requirement: Get multiple metrics filtered and organized by multiple categories from the same table ordered by another category with a limit on the number of rows displayed
+SQL Logic: Query single measures Grouped by multiple dimensions from the same table WHERE a condition is met ORDER BY a dimension LIMIT on desired number of rows
+MetricFlow query command: query --metrics revenue_total,quantity_total,revenue_average --group-by sales_key__order_date,sales_key__sales_order_line_number --limit 10 --order -sales_key__order_date --where "sales_key__sales_order_line_number = 6"
+measure: revenue_total,quantity_total,revenue_average; 
+dimensions: order_date,sales_order_line_number; 
+Table primary key: sales_key; LIMIT: 10; 
+ORDER BY: order_date; 
+WHERE condition: sales_order_line_number = 6;
+
+
+Requirement: Get single metric organized by a single category from different tables
+SQL Logic: Query a single measure Grouped by a single dimension from different tables
+MetricFlow query command: query --metrics revenue_total --group-by product__product_category
+measure: revenue_total; 
+dimension: product_category; 
+Join Table name: product
+
+
+Requirement: Get single metric filtered and organized by multiple categories from different tables
+SQL Logic: Query single measures Grouped by multiple dimensions from different tables WHERE a condition is met
+MetricFlow query command: query --metrics revenue_total,quantity_total,revenue_average --group-by product__product_category,customer__name --where "product__product_category = 'Accessories'"
+measure: revenue_total,quantity_total,revenue_average; 
+dimensions: product__product_category,customer__name; 
+Join Table names: product,customer; 
+WHERE condition: product__product_category = 'Accessories';
+
+
+Requirement: Get single metric organized by multiple categories from different tables
+SQL Logic: Query a single measure Grouped by multiple dimensions from different tables
+MetricFlow query command: query --metrics revenue_total --group-by product__product_category, customer__name
+measure: revenue_total; 
+dimensions: product_category, name; 
+Join Table names: product, customer
+
+
+Requirement: Get multiple metrics organized by a multiple categories from different tables
+SQL Logic: Query multiple measures Grouped by multiple dimensions from different tables
+MetricFlow query command: query --metrics revenue_total,quantity_total,revenue_average --group-by product__product_category,customer__name
+measure: revenue_total,quantity_total,revenue_average; 
+dimensions: product_category, name; 
+Join Table names: product, customer
+
+
+Requirement: Get multiple metrics filtered and organized by multiple categories from different tables ordered by another category with a limit on the number of rows displayed
+SQL Logic: Query single measures Grouped by multiple dimensions from different tables WHERE a condition is met ORDER BY a dimension LIMIT on desired number of rows
+MetricFlow query command: query --metrics revenue_total, quantity_total, revenue_average --group-by product__product_category, customer__name --limit 10 --order -customer__name --where "product__product_category = 'Accessories'"
+measures: revenue_total, quantity_total, revenue_average; 
+dimensions: product__product_category,customer__name; 
+Join Table names: product, customer; 
+WHERE condition: product__product_category = 'Accessories';
+ORDER BY: name
