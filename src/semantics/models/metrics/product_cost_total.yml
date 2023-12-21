@@ -1,0 +1,7 @@
+metrics:
+  - name: product_cost_total
+    description: Sum of total product cost.
+    type: simple
+    label: Product Cost Total
+    type_params:
+      measure: product_cost_total

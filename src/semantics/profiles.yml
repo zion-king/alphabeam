@@ -1,0 +1,8 @@
+dbt_alphabeam_project:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: alphabeam
+      dataset: Alphabeam_Project

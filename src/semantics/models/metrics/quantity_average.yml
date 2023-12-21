@@ -1,0 +1,7 @@
+metrics:
+  - name: quantity_average
+    description: Average of total quantity amount.
+    type: simple
+    label: Quantity Average
+    type_params:
+      measure: quantity_average

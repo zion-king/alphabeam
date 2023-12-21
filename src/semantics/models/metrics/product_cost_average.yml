@@ -1,0 +1,7 @@
+metrics:
+  - name: product_cost_average
+    description: Average of total product cost.
+    type: simple
+    label: Product Cost Average
+    type_params:
+      measure: product_cost_average
