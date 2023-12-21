@@ -1,0 +1,7 @@
+metrics:
+  - name: revenue_average
+    description: Average revenue generated based on the Sales Amount.
+    type: simple
+    label: Revenue Average
+    type_params:
+      measure: revenue_average

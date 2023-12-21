@@ -9,10 +9,10 @@ product_subcategory AS (
 )
 
 select
-    ProductKey,
-    ProductName,
-    ProductSubcategory,
-    ProductCategory,
+    ProductKey AS product_key,
+    ProductName AS product_name,
+    ProductSubcategory AS product_subcategory,
+    ProductCategory AS product_category,
     StandardCost,
     Color,
     SafetyStockLevel,
@@ -27,8 +27,8 @@ select
     ModelName,
     Description,
     Status,
-    SellStartDate,
-    SellEndDate
+    SellStartDate AS sell_start_date,
+    SellEndDate AS sell_end_date
 FROM products
 LEFT JOIN product_subcategory ON product_subcategory.ProductSubcategoryKey = products.ProductSubcategoryKey
 LEFT JOIN product_category ON product_subcategory.ProductCategoryKey = product_category.ProductCategoryKey

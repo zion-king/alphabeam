@@ -1,0 +1,7 @@
+metrics:
+  - name: revenue_total
+    description: Sum of revenue generated based on the Sales Amount
+    type: simple
+    label: Revenue Total
+    type_params:
+      measure: revenue_total

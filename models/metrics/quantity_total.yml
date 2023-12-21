@@ -1,0 +1,7 @@
+metrics:
+  - name: quantity_total
+    description: Sum of total order quantity amount.
+    type: simple
+    label: Quantity Total
+    type_params:
+      measure: quantity_total
