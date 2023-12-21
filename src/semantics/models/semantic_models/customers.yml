@@ -1,0 +1,25 @@
+semantic_models:
+  - name: customers
+    defaults:
+      agg_time_dimension: birth_date
+    description: This table is at the customers grain with one row per customer
+    model: ref('customers')
+    entities:
+      - name: customer
+        type: primary
+        expr: customer_key
+    dimensions:
+      - name: name
+        type: categorical
+      - name: marital_status
+        type: categorical
+      - name: gender
+        type: categorical
+      - name: birth_date
+        type: time
+        type_params: 
+          time_granularity: day
+      - name: date_first_purchase
+        type: time
+        type_params:
+          time_granularity: day

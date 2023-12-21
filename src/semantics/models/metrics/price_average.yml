@@ -1,0 +1,7 @@
+metrics:
+  - name: price_average
+    description: Average of total price amount.
+    type: simple
+    label: Price Average
+    type_params:
+      measure: price_average

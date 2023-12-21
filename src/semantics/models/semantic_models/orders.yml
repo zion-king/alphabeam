@@ -1,0 +1,59 @@
+semantic_models:
+  - name: orders
+    defaults:
+      agg_time_dimension: order_date
+    description: This table is at the orders grain with one row per order
+    model: ref('orders')
+    entities:
+      - name: sales_key
+        type: primary
+      - name: customer
+        type: foreign
+        expr: customer_key
+      - name: product
+        type: foreign
+        expr: product_key
+    measures:
+      - name: product_cost_total
+        description: Total cost of products
+        agg: sum
+      - name: product_cost_average
+        description: Average cost of products
+        agg: average
+      - name: price_total
+        description: Total price of the product
+        agg: sum
+      - name: price_average
+        description: Average price of the product
+        agg: average
+      - name: discount_amount_total
+        description: Total amount discounted on the product
+        agg: sum
+      - name: discount_amount_average
+        description: Average amount discounted on the product
+        agg: average
+      - name: quantity_average
+        description: Average quantity of the product
+        agg: average
+      - name: quantity_total
+        description: Total quantity of the product
+        agg: sum
+      - name: revenue_total
+        description: Total revenue generated from the order
+        agg: sum
+      - name: revenue_average
+        description: Average revenue generated from the order
+        agg: average
+    dimensions:
+      - name: sales_order_number
+        type: categorical
+      - name: sales_order_line_number
+        type: categorical
+      - name: order_date
+        type: time
+        type_params: 
+          time_granularity: day
+      - name: ship_date
+        type: time
+        type_params:
+          time_granularity: day
