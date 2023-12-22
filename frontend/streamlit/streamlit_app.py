@@ -1,0 +1,266 @@
+import os
+import requests
+from google.cloud import bigquery
+import random
+import pandas as pd
+import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import streamlit as st
+
+pd.set_option('display.max_rows', None, 'display.max_columns', None)
+
+#######################################
+# PAGE SETUP
+#######################################
+st.set_page_config(page_title="Sales Dashboard", page_icon=":bar_chart:", layout="wide")
+
+st.title("Sales Dashboard")
+# st.markdown("_Prototype v0.4.1_")
+
+with st.sidebar:
+    st.header("Chat bot")
+    # Function to send user query to the Flask API
+    def send_query(user_query):
+        api_url = "http://localhost:5000/api/query"  # Replace with your actual Flask API URL
+        response = requests.post(api_url, json={"userQuery": user_query})
+        if response.status_code == 200:
+            return response.json().get("result", "Error processing request")
+        else:
+            return "Error communicating with the Flask API"
+
+    # Initialize session_state to store user messages
+    if 'user_messages' not in st.session_state:
+        st.session_state.user_messages = []
+
+    # Streamlit app layout
+    def main():
+        st.title("Chat System Interface")
+
+        # User input
+        user_input = st.text_input("Type your query:")
+
+        # Send button
+        if st.button("Send") and user_input:
+            # Store user message in session_state
+            st.session_state.user_messages.append(("You", user_input))
+
+            # Display user message
+            st.text(f"You: {user_input}")
+
+            # Send user query to the Flask API
+            bot_response = send_query(user_input)
+
+            # Store bot response in session_state
+            st.session_state.user_messages.append(("Bot", bot_response))
+
+            # Display bot response
+            st.text(f"Bot: {bot_response}")
+
+        # Display chat history
+        st.text("Chat History:")
+        for sender, message in st.session_state.user_messages:
+            st.text(f"{sender}: {message}")
+    if __name__ == "__main__":
+        main()    
+
+# ######################################
+# DATA LOADING: Connect to Google bigquery
+# ######################################
+
+def merge_table(table1, table2, left_on, right_on):
+    new_df = pd.merge(table1, table2, left_on=left_on, right_on=right_on)
+    return new_df
+
+
+customers = pd.read_csv("frontend\\streamlit\\dataset\\customer.csv")
+products = pd.read_csv("frontend\\streamlit\\dataset\\product.csv")
+sales = pd.read_csv("frontend\\streamlit\\dataset\\sales.csv")
+
+df = merge_table(merge_table(customers, sales, left_on='customer_key', right_on='customer_key'), products, left_on='product_key', right_on='product_key')
+df["Profit"] = df["revenue_total"] - df["product_cost_total"]      
+
+best_revenue = df.groupby('product_name')['revenue_total'].sum().reset_index().sort_values(by='revenue_total', ascending=True).head(10)
+best_category = pd.melt(df[["product_category", 'product_cost_total', 'revenue_total', 'Profit']], 
+                    id_vars='product_category', var_name='Variable', value_name='Value')
+
+# #######################################
+# # VISUALIZATION METHODS
+# #######################################
+
+def plot_metric(label, value, prefix="", suffix="", show_graph=False, color_graph=""):
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Indicator(
+            value=value,
+            gauge={"axis": {"visible": False}},
+            number={
+                "prefix": prefix,
+                "suffix": suffix,
+                "font.size": 28,
+            },
+            title={
+                "text": label,
+                "font": {"size": 24},
+            },
+        )
+    )
+
+    if show_graph:
+        fig.add_trace(
+            go.Scatter(
+                y=random.sample(range(0, 101), 30),
+                hoverinfo="skip",
+                fill="tozeroy",
+                fillcolor=color_graph,
+                line={
+                    "color": color_graph,
+                },
+            )
+        )
+
+    fig.update_xaxes(visible=False, fixedrange=True)
+    fig.update_yaxes(visible=False, fixedrange=True)
+    fig.update_layout(
+        # paper_bgcolor="lightgrey",
+        margin=dict(t=50, b=0),
+        showlegend=False,
+        plot_bgcolor="white",
+        height=100,
+        
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def plot_bottom_left():
+    best_product = best_revenue
+
+    fig = px.bar(
+    best_product,
+    y="product_name",
+    x="revenue_total",
+    barmode="group",
+    text_auto=".2s",
+    title="Best Selling product for Year 2023",
+    height=500,
+)
+
+    fig.update_traces(
+    marker_color='#abcded',  # Set the bar color to blue
+    textfont_size=10,
+    textangle=0,
+    textposition="outside",
+    cliponaxis=False,
+)
+
+    fig.update_layout(
+    xaxis=dict(title="", tickangle=45, tickmode="linear", showticklabels=True),  # Turn off x-axis labels
+    yaxis=dict(title="Product Name", tickmode="linear", automargin=True, showticklabels=False),
+    margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins to create space
+)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+
+def plot_bottom_right():
+    # Melt the DataFrame to have a 'Variable' column
+    best_cat = best_category
+
+    # Create a bar chart
+    fig = px.bar(best_cat, 
+             x='product_category', 
+             y='Value', 
+             color='Variable',
+             barmode="group",
+             title='Category Review using Sales Revenue and Profit Margin',
+             color_discrete_map={'product_cost_total': '#2596BE', 'revenue_total': '#97844c', 'Profit': '#9e6945'},
+             labels={'Value': 'Column Value'}, 
+             height=500,)
+
+
+    fig.update_traces(
+       textfont_size=10, 
+       textangle=0, 
+       textposition="outside", 
+       cliponaxis=False
+    )
+
+
+    # Update layout to have side-by-side bars
+    fig.update_layout(
+        xaxis=dict(title="Product Category", tickangle=0, tickmode="linear", showticklabels=True),  # Turn off x-axis labels
+        yaxis=dict(title="Dollars", showticklabels=True),
+        margin=dict(l=50, r=50, t=100, b=50),  # Adjust margins to create space
+        legend_orientation='h',
+        legend=dict(y=1.02, x=0.5, xanchor='center', yanchor='bottom', title_text=''),
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# #######################################
+# # STREAMLIT LAYOUT
+# #######################################
+
+# top_left_column, top_right_column = st.columns((2,1))
+# with top_left_column:
+column_1, column_2, column_3, column_4= st.columns(4)
+
+with column_1:
+    plot_metric(
+        "Total Cost",
+        df["product_cost_total"].sum(),
+        prefix="$",
+        suffix="",
+        show_graph=True,
+        color_graph="rgba(0, 104, 201, 0.2)",
+    )
+    # plot_gauge(df["product_cost_total"].mean(), "#0068C9", "$", "Current Ratio", df["product_cost_total"].max())
+
+with column_2:
+    plot_metric(
+            "Total Product Sold",
+            df["quantity_total"].sum(),
+            prefix="",
+            suffix="",
+            show_graph=True,
+            color_graph="rgba(0, 104, 201, 0.2)",
+        )
+    # plot_gauge(df["quantity_total"].mean(), "#0068C9", "", "Current Ratio", df["quantity_total"].max())
+
+
+with column_3:
+    plot_metric(
+        "Total Revenue",
+        df["revenue_total"].sum(),
+        prefix="$",
+        suffix="",
+        show_graph=True,
+        color_graph="rgba(0, 104, 201, 0.2)",
+    )
+    # plot_gauge(df["revenue_average"].mean(), "#0068C9", "$", "Current Ratio", df["revenue_average"].max())
+
+
+with column_4:
+    plot_metric(
+            "Profit Margin",
+            df["Profit"].sum(),
+            prefix="$",
+            suffix="",
+            show_graph=True,
+            color_graph="rgba(0, 104, 201, 0.2)",
+        )
+# plot_gauge(df["Profit"].mean(), "#0068C9", "", "Current Ratio", df["Profit"].max())
+
+bottom_left_column, bottom_right_column = st.columns((2,3))
+
+# with top_right_column:
+#     plot_top_right()
+
+with bottom_left_column:
+    plot_bottom_left()
+
+with bottom_right_column:
+    plot_bottom_right()
