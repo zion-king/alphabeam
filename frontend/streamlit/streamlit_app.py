@@ -22,7 +22,7 @@ with st.sidebar:
     st.header("Chat bot")
     # Function to send user query to the Flask API
     def send_query(user_query):
-        api_url = "http://localhost:5000/api/query"  # Replace with your actual Flask API URL
+        api_url = "http://34.69.102.150/health"  # Replace with your actual Flask API URL
         response = requests.post(api_url, json={"userQuery": user_query})
         if response.status_code == 200:
             return response.json().get("result", "Error processing request")
@@ -52,10 +52,10 @@ with st.sidebar:
             bot_response = send_query(user_input)
 
             # Store bot response in session_state
-            st.session_state.user_messages.append(("Bot", bot_response))
+            st.session_state.user_messages.append(("AI Engine", bot_response))
 
             # Display bot response
-            st.text(f"Bot: {bot_response}")
+            st.text(f"AI Engine: {bot_response}")
 
         # Display chat history
         st.text("Chat History:")
