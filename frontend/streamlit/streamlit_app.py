@@ -27,7 +27,7 @@ with st.sidebar:
         if response.status_code == 200:
             return response.json().get("result", "Error processing request")
         else:
-            return "Error communicating with the Flask API"
+            return "Error communicating with the AI engine"
 
     # Initialize session_state to store user messages
     if 'user_messages' not in st.session_state:
@@ -35,7 +35,7 @@ with st.sidebar:
 
     # Streamlit app layout
     def main():
-        st.title("Chat System Interface")
+        st.title("AI Chat System")
 
         # User input
         user_input = st.text_input("Type your query:")
