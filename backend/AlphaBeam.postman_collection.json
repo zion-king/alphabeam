@@ -1,0 +1,73 @@
+{
+	"info": {
+		"_postman_id": "92535850-249b-48fb-864c-480abbb138bf",
+		"name": "AlphaBeam",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30135189"
+	},
+	"item": [
+		{
+			"name": "Embedding",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "projectName",
+							"value": "semantic_layer_4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/embedding",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"embedding"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieval",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"projectName\": \"semantic_layer_4\",\r\n    \"query\": \"how much did we make in August?\", \r\n    \"reset_chat\": \"True\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/retrieval",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"retrieval"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
