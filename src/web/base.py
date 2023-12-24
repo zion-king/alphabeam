@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 """Readability Web reader."""
 import unicodedata
 from pathlib import Path
-from llama_index.langchain_helpers.text_splitter import TextSplitter
+from llama_index.node_parser.interface import TextSplitter
 
 path = Path(__file__).parent / "Readability.js"
 

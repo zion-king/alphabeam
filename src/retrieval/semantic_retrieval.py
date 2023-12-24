@@ -1,3 +1,4 @@
+import io
 import os
 import time
 import openai
@@ -159,41 +160,6 @@ def get_formatted_sources(response, length=100, trim_text=True) -> str:
     return "\n\n".join(texts)
 
 
-def answer_query_stream(query, index_name, chat_history, prompt_style):
-
-    index, doc_size = get_index_from_vector_db(index_name)
-
-    if index is None:
-        response = "Requested information not found"
-        return response
-    else:
-        node_postprocessors = postprocessor_args(doc_size)
-        similarity_top_k = 200 if doc_size>200 else doc_size
-        chat_engine = index.as_chat_engine(chat_mode="context", 
-                                            # memory=chat_history, # shouldn't retain chat history here
-                                            system_prompt=prompt_style, 
-                                            similarity_top_k=similarity_top_k,
-                                            verbose=True, 
-                                            # streaming=True,
-                                            function_call="query_engine_tool",
-                                            node_postprocessors=node_postprocessors
-                                            )
-
-        message_body = f"""\nUse the tool to answer:\n{query}\n"""
-        response = chat_engine.chat(message_body)
-        
-        if response is None:
-            print("Index retrieved but couldn't stream response...")
-            chat_response = "I'm sorry I couldn't find an answer to the requested information in your knowledge base. Please rephrase your question and try again."
-            # for token in chat_response.split():
-            #     print(token, end=" ")
-            #     yield f"""{token} """
-            return chat_response
-        else:
-            print('Starting response stream...\n...........................\n...........................')
-            return response.response
-
-
 def semantic_prompt_style(): 
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for conversational business intelligence.
@@ -211,31 +177,37 @@ def query_gen_prompt_style():
         # print(file)
         few_shot_examples = f.read()
 
-    prompt_header = f"""Your name is Alpha, a highly intelligent system for 
-    conversational business intelligence. As an SQL expert, your goal is to use the provided knowledege base, 
-    containing metrics and semantic models of a business dataset, to generate a MetricFlow query command needed to answer the question.
-    The general syntax for the MetricFlow query command is:
-    `query --metrics <measure(s)> --group-by <table-1__dimension-1, table-1__dimension-2,..., table-n__dimension-n> --limit <int> --order <table__dimension> --where <condition>`
-    
+    prompt_header = f"""Your name is Alpha, a highly intelligent system for conversational business intelligence. 
+    As an SQL and dbt MetricFlow expert, your goal is to use the provided knowledege base, containing dbt metrics and 
+    semantic models of a business dataset, to generate a MetricFlow query command needed to answer the question.
+    The provided knowledge base also contains the MetricFlow documentation which provides a comprehensive description of the MetricFlow command syntax.
+       
     To generate the correct MetricFlow query command, determine the following:
-    1. Which metrics are needed to answer the question?
-    2. Which tables contain the required data?
-    3. Which dimensions in the tables contain the required data?
-    4. Do the results need to be filtered by a specific condition?
-    5. Do the results need to be ordered by a specific dimension?
-    6. Is there a limit on the number of records requested?
+    1. Which metrics are needed to answer the question? --metrics
+    2. Which tables and dimensions contain the required data? --group-by <table_name__dimension_name>
+    4. Is there a specific time interval requested? --start-time 'YYYY-MM-DD' --end-time 'YYYY-MM-DD' 
+    5. Do the results need to be filtered by a specific condition? --where
+    6. Do the results need to be ordered by a specific table dimension? --order
+    7. Is there a limit on the number of records requested? --limit
 
-    Here's some examples of how a MetricFlow query command is generated using the information in the knowledge base.
+    Here's a few examples of how a business requirement is translated into a MetricFlow query command in accordance with the semantic models in the knowledge base.
     {few_shot_examples}
 
-    The measures, dimensions, tables and other parameters referenced in the above examples are 
-    obtained from the knowledege base provided below. Following these examples, generate a single-line query command that answers the question. 
-    Return only this command or return "Null" if the provided information is not sufficient to answer the question.
+    Following these examples, generate a single-line query command that answers the question, using the relevant metric, table and dimension names obtained from the dbt semantic and metric models.
+    Return only this command without any further explanation, or return "Null" if the provided information is not sufficient to answer the question.
     """
+    # The measures, dimensions, tables and other parameters referenced in the above examples are 
+    # obtained from the knowledege base provided below. 
+     
+    # The general syntax for the MetricFlow query command is:
+    # `mf query --metrics <measure(s)> --group-by <table-1__dimension-1,table-1__dimension-2,...,table-n__dimension-n> --where <condition> --start-time 'YYYY-MM-DD' --end-time 'YYYY-MM-DD' --order <table__dimension> --limit <int>`
+
+    # 3. Which dimensions in the tables contain the required data?
+
 
     return prompt_header   
 
-def returned_data_prompt_style():
+def retrieved_data_prompt_style():
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for 
     conversational business intelligence. Your task is to use the entirety of the 
@@ -245,27 +217,69 @@ def returned_data_prompt_style():
     return prompt_header   
 
 
-def fetch_data(user_query, llm_query_input)
+def answer_query_stream(query, index_name, prompt_style):
+
+    index, doc_size = get_index_from_vector_db(index_name)
+
+    if index is None:
+        response = "Requested information not found"
+        return response
+    else:
+        node_postprocessors = postprocessor_args(doc_size)
+        similarity_top_k = 200 if doc_size>200 else doc_size
+        chat_engine = index.as_chat_engine(chat_mode="context", 
+                                            # memory=chat_history, # shouldn't retain chat history here
+                                            system_prompt=prompt_style, 
+                                            similarity_top_k=similarity_top_k,
+                                            # verbose=True, 
+                                            # streaming=True,
+                                            function_call="query_engine_tool",
+                                            node_postprocessors=node_postprocessors
+                                            )
+
+        message_body = f"""\nUse the tool to answer:\n{query}\n"""
+        response = chat_engine.chat(message_body)
+        
+        if response is None:
+            chat_response = "I'm sorry I couldn't find an answer to the requested information in your semantic knowledge base. Please rephrase your question and try again."
+            return chat_response
+        else:
+            print('Starting response stream...\n...........................\n...........................')
+            return f'''{response.response}'''
+
+
+def fetch_data(user_query, llm_query_input, chat_history):
     
-    data = llm_run_query(llm_query_input)
-    doc = Document(text=str(data))
-    
-    node_parser = SimpleNodeParser.from_defaults(
-        chunk_size=1024,
-        chunk_overlap=20
-        )
+    query_output = llm_run_query_cmd(llm_query_input)
+
+    # if query_output['statusCode']==500:
+    #     return "There was a problem retrieving the requested information from your database. Please try again."
+
+    # data = query_output.stdout
+    print(query_output, end="")
+    # doc = Document(text=str(data))
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with open(os.path.join(temp_dir, 'query_records.txt'), 'w', encoding='utf-8') as file:
+            file.write(str(query_output))
+        
+        doc = SimpleDirectoryReader(input_dir=temp_dir).load_data()
+
+    # doc = SimpleDirectoryReader(input_dir="./retrieval/data/output.txt").load_data()
 
     service_context = ServiceContext.from_defaults(
         llm=Gemini(model='models/gemini-pro', temperature=0),
         embed_model=GeminiEmbedding(),
-        node_parser=node_parser,
+        # node_parser=node_parser,
+        chunk_size=1024,
+        chunk_overlap=20
         )
     
     index = VectorStoreIndex.from_documents(doc, service_context=service_context)
 
     chat_engine = index.as_chat_engine(chat_mode="context", 
                                         memory=chat_history,
-                                        system_prompt=returned_data_prompt_style(), 
+                                        system_prompt=retrieved_data_prompt_style(), 
                                         similarity_top_k=30,
                                         verbose=True, 
                                         # streaming=True,
@@ -277,16 +291,15 @@ def fetch_data(user_query, llm_query_input)
     
     if response is None:
         print("Index retrieved but couldn't stream response...")
-        chat_response = "I'm sorry I couldn't find an answer to the requested information in your knowledge base. Please rephrase your question and try again."
-        # for token in chat_response.split():
-        #     print(token, end=" ")
-        #     yield f"""{token} """
+        chat_response = "I'm sorry I couldn't find an answer to the requested information in your database. Please rephrase your question and try again."
         return chat_response
     else:
         print('Starting response stream...\n...........................\n...........................')
         return response.response
 
-
+def init_chat_history():
+    new_conversation_state = ChatMemoryBuffer.from_defaults(token_limit=50000)
+    return new_conversation_state
 
 
 
