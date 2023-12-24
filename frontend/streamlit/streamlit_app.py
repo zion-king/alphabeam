@@ -188,7 +188,6 @@ def plot_bottom_right():
     )
 
 
-    # Update layout to have side-by-side bars
     fig.update_layout(
         xaxis=dict(title="Product Category", tickangle=0, tickmode="linear", showticklabels=True),  # Turn off x-axis labels
         yaxis=dict(title="Dollars", showticklabels=True),
@@ -204,8 +203,7 @@ def plot_bottom_right():
 # # STREAMLIT LAYOUT
 # #######################################
 
-# top_left_column, top_right_column = st.columns((2,1))
-# with top_left_column:
+
 column_1, column_2, column_3, column_4= st.columns(4)
 
 with column_1:
@@ -217,7 +215,6 @@ with column_1:
         show_graph=True,
         color_graph="rgba(0, 104, 201, 0.2)",
     )
-    # plot_gauge(df["product_cost_total"].mean(), "#0068C9", "$", "Current Ratio", df["product_cost_total"].max())
 
 with column_2:
     plot_metric(
@@ -228,7 +225,6 @@ with column_2:
             show_graph=True,
             color_graph="rgba(0, 104, 201, 0.2)",
         )
-    # plot_gauge(df["quantity_total"].mean(), "#0068C9", "", "Current Ratio", df["quantity_total"].max())
 
 
 with column_3:
@@ -240,7 +236,6 @@ with column_3:
         show_graph=True,
         color_graph="rgba(0, 104, 201, 0.2)",
     )
-    # plot_gauge(df["revenue_average"].mean(), "#0068C9", "$", "Current Ratio", df["revenue_average"].max())
 
 
 with column_4:
@@ -252,12 +247,9 @@ with column_4:
             show_graph=True,
             color_graph="rgba(0, 104, 201, 0.2)",
         )
-# plot_gauge(df["Profit"].mean(), "#0068C9", "", "Current Ratio", df["Profit"].max())
 
 bottom_left_column, bottom_right_column = st.columns((2,3))
 
-# with top_right_column:
-#     plot_top_right()
 
 with bottom_left_column:
     plot_bottom_left()
