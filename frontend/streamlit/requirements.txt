@@ -1,0 +1,18 @@
+# tenacity>=8.2.3
+chromadb
+llama_index
+google-generativeai
+cohere
+pypdf
+flask
+gcloud
+trulens-eval
+html2text
+playwright
+plotly
+openai
+pydantic
+streamlit
+flask-cors
+dbt-bigquery
+metricflow[bigquery]
