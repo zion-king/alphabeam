@@ -1,9 +1,6 @@
 import io
 import os
 import time
-import openai
-import tiktoken
-import cohere
 import chromadb
 import tempfile
 import google.generativeai as genai
@@ -20,7 +17,9 @@ from llama_index.text_splitter import TokenTextSplitter
 from llama_index.node_parser import SimpleNodeParser
 from google.oauth2 import service_account
 from assistants.functions import *
-from src.embedding_utils import *
+from embedding_utils import *
+import warnings
+warnings.filterwarnings("ignore")
 
 GOOGLE_API_KEY = 'AIzaSyB4Aew8oVjBgPMZlskdhdmQs27DuyNBDAY'
 os.environ["GOOGLE_API_KEY"]  = GOOGLE_API_KEY
@@ -61,10 +60,6 @@ def get_index_from_vector_db(index_name):
     llm = Gemini(api_key=GOOGLE_API_KEY, model='models/gemini-pro', temperature=0)
     print_msg = "Using Gemini Pro..."
     print(print_msg)
-
-    # node_parser = SimpleNodeParser.from_defaults(
-    #     text_splitter=TokenTextSplitter(chunk_size=1024, chunk_overlap=20)
-    #     )
 
     service_context = ServiceContext.from_defaults(
         llm=llm,
@@ -111,7 +106,7 @@ def postprocessor_args(doc_size):
         cohere_rerank,
     ] \
         if doc_size>100 \
-            else [cohere_rank]
+            else [cohere_rerank]
 
     return node_postprocessors
 
@@ -189,11 +184,16 @@ def query_gen_prompt_style():
     5. Do the results need to be filtered by a specific condition? --where
     6. Do the results need to be ordered by a specific table dimension? --order
     7. Is there a limit on the number of records requested? --limit
-
+    
     Here's a few examples of how a business requirement is translated into a MetricFlow query command in accordance with the semantic models in the knowledge base.
     {few_shot_examples}
 
     Following these examples, generate a single-line query command that answers the question, using the relevant metric, table and dimension names obtained from the dbt semantic and metric models.
+    If a time interval is requested, dont include --where in the command, use --start-time and --end-time instead
+    Use a double underscore to link every dimension name to its corresponding table name <table__dimension>, as in the following examples:
+       - order date is in the sales_key table hence it must be referenced as `sales_key__order_date`
+       - product category is in the product table hence it must be referenced as `product__product_category`
+       - In your --group-by, where, or --order expressions, don't ever use only dimension names without linking with the table name.
     Return only this command without any further explanation, or return "Null" if the provided information is not sufficient to answer the question.
     """
     # The measures, dimensions, tables and other parameters referenced in the above examples are 
@@ -204,14 +204,22 @@ def query_gen_prompt_style():
 
     # 3. Which dimensions in the tables contain the required data?
 
-
     return prompt_header   
 
-def retrieved_data_prompt_style():
+def retrieved_data_prompt_style(llm_query_input):
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for 
-    conversational business intelligence. Your task is to use the entirety of the 
-    provided data, which has been fetched from a database, to answer my question.
+    conversational business intelligence. Your task is to provide data analysis and interpretation 
+    to a non-technical audience using the provided data, which has been fetched from a database.
+    If the provided data doesn't contain the answer to the question, return the data it contains, with a comprehensive explanation.                
+    
+    The data was retrieved as a table and converted to text. The Metricflow command used to generate the provided data is as follows:
+    {llm_query_input}
+
+    This should give you additional context about how the database was queried to fetch the data.
+    The retrieved data contains the relevant metrics and dimensions useful for answering the question.
+    Ensure that you interpret the data carefully whether or not it answers the question, and let your response be as comprehensive and explanatory as possible. 
+    Never decline to answer my question. If you are unable to answer the question, interpret the available information in the data and return a contextual explanation of what the data contains.
     """
 
     return prompt_header   
@@ -231,8 +239,6 @@ def answer_query_stream(query, index_name, prompt_style):
                                             # memory=chat_history, # shouldn't retain chat history here
                                             system_prompt=prompt_style, 
                                             similarity_top_k=similarity_top_k,
-                                            # verbose=True, 
-                                            # streaming=True,
                                             function_call="query_engine_tool",
                                             node_postprocessors=node_postprocessors
                                             )
@@ -250,27 +256,17 @@ def answer_query_stream(query, index_name, prompt_style):
 
 def fetch_data(user_query, llm_query_input, chat_history):
     
-    query_output = llm_run_query_cmd(llm_query_input)
+    query_output_dir = llm_run_query_cmd(llm_query_input)
 
-    # if query_output['statusCode']==500:
-    #     return "There was a problem retrieving the requested information from your database. Please try again."
-
-    # data = query_output.stdout
-    print(query_output, end="")
-    # doc = Document(text=str(data))
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        with open(os.path.join(temp_dir, 'query_records.txt'), 'w', encoding='utf-8') as file:
-            file.write(str(query_output))
+    if query_output_dir is None:
+        return "Could not fetch data from the database. Please try again and if the problem persists, inform your IT team."
         
-        doc = SimpleDirectoryReader(input_dir=temp_dir).load_data()
-
-    # doc = SimpleDirectoryReader(input_dir="./retrieval/data/output.txt").load_data()
+    doc = SimpleDirectoryReader(input_dir=query_output_dir).load_data()
+    # doc = SimpleDirectoryReader(input_dir="./retrieval/data").load_data()
 
     service_context = ServiceContext.from_defaults(
         llm=Gemini(model='models/gemini-pro', temperature=0),
         embed_model=GeminiEmbedding(),
-        # node_parser=node_parser,
         chunk_size=1024,
         chunk_overlap=20
         )
@@ -279,14 +275,14 @@ def fetch_data(user_query, llm_query_input, chat_history):
 
     chat_engine = index.as_chat_engine(chat_mode="context", 
                                         memory=chat_history,
-                                        system_prompt=retrieved_data_prompt_style(), 
+                                        system_prompt=retrieved_data_prompt_style(llm_query_input), 
                                         similarity_top_k=30,
                                         verbose=True, 
                                         # streaming=True,
                                         function_call="query_engine_tool",
                                         )
 
-    message_body = f"""\nUse the tool to answer:\n{user_query}\n"""
+    message_body = f"""\n{user_query}\n"""
     response = chat_engine.chat(message_body)
     
     if response is None:
