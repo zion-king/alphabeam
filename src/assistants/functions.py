@@ -77,19 +77,19 @@ def run_query(metrics: List[str],
     return output
 
 
-def llm_run_query_cmd(llm_query_input: str):
+def llm_run_query_cmd(llm_query_input: str, temp_dir):
     try:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_file = f"{temp_dir}/query_temp_records.txt"
-            output = subprocess.run(llm_query_input+" >"+temp_file, 
-                                cwd="./semantics/",
-                                text=True, 
-                                shell=True, 
-                                encoding="utf-16",
-                                capture_output=True,
-                                )
-            print(output.stdout)
-            return temp_dir
+        temp_file = f"{temp_dir}/query_temp_records.txt"
+        output = subprocess.run(llm_query_input+" >"+temp_file, 
+                            cwd="./semantics/",
+                            text=True, 
+                            shell=True, 
+                            encoding="utf-8",
+                            capture_output=True,
+                            )
+        with open(temp_file, "r") as f:
+            print('Extracting data from database\n', f.read())
+        return temp_dir
                                 
     except Exception as e:
         print("Lots of encoding errors!!!")

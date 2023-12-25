@@ -256,12 +256,13 @@ def answer_query_stream(query, index_name, prompt_style):
 
 def fetch_data(user_query, llm_query_input, chat_history):
     
-    query_output_dir = llm_run_query_cmd(llm_query_input)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        query_output_dir = llm_run_query_cmd(llm_query_input, temp_dir)
 
-    if query_output_dir is None:
-        return "Could not fetch data from the database. Please try again and if the problem persists, inform your IT team."
+        if query_output_dir is None:
+            return "Could not fetch data from the database. Please try again and if the problem persists, inform your IT team."
         
-    doc = SimpleDirectoryReader(input_dir=query_output_dir).load_data()
+        doc = SimpleDirectoryReader(input_dir=query_output_dir).load_data()
     # doc = SimpleDirectoryReader(input_dir="./retrieval/data").load_data()
 
     service_context = ServiceContext.from_defaults(
