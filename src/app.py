@@ -53,12 +53,14 @@ def answer_gen():
     if project['reset_chat'] in [True,'True','Yes']:
         app.chat_history = init_chat_history()
 
-    # query semantic layer to check whether information exists
     query = project['query']
-    answer_exists = answer_query_stream(query, index_name, semantic_prompt_style())
 
-    if answer_exists != 'Yes':
-        return "The source data doesn't contain the requested information. Please rephrase your question or ask me another question."
+    # query semantic layer to check whether information exists
+    # we will revist this layer... more prompt tuning required
+    # answer_exists = answer_query_stream(query, index_name, semantic_prompt_style())
+
+    # if answer_exists != 'Yes':
+    #     return "The source data doesn't contain the requested information. Please rephrase your question or ask me another question."
     
     # use semantic and metric layers to assist Gemini to generate MetricFlow command to retrieve the data
     metrif_flow_command = answer_query_stream(query, index_name, query_gen_prompt_style())
@@ -66,7 +68,12 @@ def answer_gen():
 
     # run generated MetricFlow command against database
     output = fetch_data(query, metrif_flow_command, app.chat_history)
-    return output
+    
+    return jsonify(
+        {
+            "statusCode": 200,
+            "result": output
+        })
 
 
 if __name__ == "__main__":

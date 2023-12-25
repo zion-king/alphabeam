@@ -13,17 +13,19 @@ pd.set_option('display.max_rows', None, 'display.max_columns', None)
 #######################################
 # PAGE SETUP
 #######################################
-st.set_page_config(page_title="Sales Dashboard", page_icon=":bar_chart:", layout="wide")
+st.set_page_config(page_title="AlphaBeam Dashboard", page_icon=":bar_chart:", layout="wide")
 
-st.title("Sales Dashboard")
+st.title("AlphaBeam Dashboard")
 # st.markdown("_Prototype v0.4.1_")
 
 with st.sidebar:
-    st.header("Chat bot")
+    # st.header("AlphaBeam Chat Engine")
     # Function to send user query to the Flask API
     def send_query(user_query):
-        api_url = "http://34.69.102.150/health"  # Replace with your actual Flask API URL
-        response = requests.post(api_url, json={"userQuery": user_query})
+        api_url = "http://34.69.102.150/retrieval"  # Replace with your actual Flask API URL
+        response = requests.post(api_url, json={"projectName": "semantic_layer_4", 
+                                                "query": user_query,
+                                                "reset_chat": True})
         if response.status_code == 200:
             return response.json().get("result", "Error processing request")
         else:
@@ -35,10 +37,10 @@ with st.sidebar:
 
     # Streamlit app layout
     def main():
-        st.title("AI Chat System")
+        st.title("AlphaBeam Chat Engine")
 
         # User input
-        user_input = st.text_input("Type your query:")
+        user_input = st.text_input("Enter your query:")
 
         # Send button
         if st.button("Send") and user_input:

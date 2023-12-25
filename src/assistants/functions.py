@@ -3,6 +3,7 @@ import io
 import os
 import re
 import json
+import tempfile
 import subprocess
 import google.auth
 from metricflow import MetricFlowClient
@@ -11,6 +12,9 @@ from metricflow.protocols.sql_client import SqlClient
 from google.cloud.bigquery.client import Client
 
 from typing import Any, List, Dict, Optional, Tuple
+
+import warnings
+warnings.filterwarnings("ignore")
 
 # sys.setdefaultencoding("utf-8")
 # os.environ("PYTHONIOENCODING") = "utf-8"
@@ -74,53 +78,22 @@ def run_query(metrics: List[str],
 
 
 def llm_run_query_cmd(llm_query_input: str):
-    # output = subprocess.run("mf query --metrics revenue_total --group-by metric_time --start-time '2017-08-01' --end-time '2017-08-31' ", 
-    #                         cwd="./semantics/",
-    #                         shell=True,
-    #                         text=True,
-    #                         capture_output=True,)
-
     try:
-        output = subprocess.run(llm_query_input, 
-                            cwd="./semantics/",
-                            text=True, 
-                            shell=True, 
-                            encoding="utf-16",
-                            capture_output=True,
-                            )
-        return output.stdout
-
-    # output = subprocess.getstatusoutput("mf query --metrics revenue_total --group-by metric_time --start-time '2017-08-01' --end-time '2017-08-31' ", 
-    #                             # cwd="./semantics/",
-    #                             )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file = f"{temp_dir}/query_temp_records.txt"
+            output = subprocess.run(llm_query_input+" >"+temp_file, 
+                                cwd="./semantics/",
+                                text=True, 
+                                shell=True, 
+                                encoding="utf-16",
+                                capture_output=True,
+                                )
+            print(output.stdout)
+            return temp_dir
                                 
     except Exception as e:
         print("Lots of encoding errors!!!")
-        return "Couldn't fetch data"
-
-    # command = llm_query_input +  "> ./retrieval/data/output.txt"
-    # exit_status = os.system(command)
-
-    # Check if the command was successful (exit status 0)
-    # if exit_status == 0:
-    #     with open("output.txt", "r", encoding="utf-8") as output_file:
-    #         output = output_file.read()
-    #     return output
-        # with io.open(sys.stdout.fileno(), "w", encoding="utf-8") as stdout:
-        #     exit_status = os.system(command)
-
-        # return {
-        #     'statusCode': 200,
-        #     'status': 'Data retrieved successfully',
-        # }
-    
-    # else:
-    #     return {
-    #         'statusCode': 500,
-    #         'status': f"Error executing the command. Exit status: {exit_status}",
-    #     }
-
-    # return output.stdout
+        return None
 
 
 def llm_run_query_func(llm_query_input: str):
@@ -208,9 +181,3 @@ def decompose_metricflow_command(command_string):
 
    return params
 
-
-
-
-# examples
-metric = "revenue_total"
-action = ""

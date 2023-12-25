@@ -14,3 +14,4 @@ gcloud==0.18.3
 trulens_eval==0.19.2
 html2text>=2020.1.16 
 playwright==1.40.0
+plotly==5.18.0
