@@ -20,7 +20,7 @@ from llama_index.text_splitter import TokenTextSplitter
 from llama_index.node_parser import SimpleNodeParser
 from google.oauth2 import service_account
 from assistants.functions import *
-from embedding_utils import *
+from src.embedding_utils import *
 
 GOOGLE_API_KEY = 'AIzaSyB4Aew8oVjBgPMZlskdhdmQs27DuyNBDAY'
 os.environ["GOOGLE_API_KEY"]  = GOOGLE_API_KEY
