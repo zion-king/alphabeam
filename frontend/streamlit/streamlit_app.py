@@ -150,7 +150,7 @@ def plot_bottom_left():
 )
 
     fig.update_traces(
-    marker_color='#abcded',  # Set the bar color to blue
+    marker_color='#8690FF',  # Set the bar color to light purple
     textfont_size=10,
     textangle=0,
     textposition="outside",
@@ -158,7 +158,7 @@ def plot_bottom_left():
 )
 
     fig.update_layout(
-    xaxis=dict(title="Total Revenue (Dollars)", showticklabels=True),  # Turn off x-axis labels tickangle=45, tickmode="linear",
+    xaxis=dict(title="Total Revenue (USD)", showticklabels=True),  # Turn off x-axis labels tickangle=45, tickmode="linear",
     yaxis=dict(title="Product Name", tickmode="linear", automargin=True, showticklabels=True),
     margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins to create space
 )
@@ -177,7 +177,7 @@ def plot_bottom_right():
              color='Variable',
              barmode="group",
              title='Category Review using Sales Revenue and Profit Margin',
-             color_discrete_map={'product_cost_total': '#2596BE', 'revenue_total': '#97844c', 'Profit': '#9e6945'},
+             color_discrete_map={'product_cost_total': '#8690FF', 'revenue_total': 'teal', 'Profit': 'navy'},
              labels={'Value': 'Column Value'}, 
              height=550,)
 
@@ -192,7 +192,7 @@ def plot_bottom_right():
 
     fig.update_layout(
         xaxis=dict(title="Product Category", tickangle=0, tickmode="linear", showticklabels=True),  # Turn off x-axis labels
-        yaxis=dict(title="Dollars", showticklabels=True),
+        yaxis=dict(title="Volume (USD)", showticklabels=True),
         margin=dict(l=50, r=50, t=100, b=50),  # Adjust margins to create space
         legend_orientation='h',
         legend=dict(y=1.02, x=0.5, xanchor='center', yanchor='bottom', title_text=''),
@@ -215,7 +215,7 @@ with column_1:
         prefix="$",
         suffix="",
         show_graph=True,
-        color_graph="rgba(0, 104, 201, 0.2)",
+        color_graph="#b2d8d8",
     )
 
 with column_2:
@@ -225,7 +225,7 @@ with column_2:
             prefix="",
             suffix="",
             show_graph=True,
-            color_graph="rgba(0, 104, 201, 0.2)",
+            color_graph="#b2d8d8",
         )
 
 
@@ -236,7 +236,7 @@ with column_3:
         prefix="$",
         suffix="",
         show_graph=True,
-        color_graph="rgba(0, 104, 201, 0.2)",
+        color_graph="#b2d8d8",
     )
 
 
@@ -247,7 +247,7 @@ with column_4:
             prefix="$",
             suffix="",
             show_graph=True,
-            color_graph="rgba(0, 104, 201, 0.2)",
+            color_graph="#b2d8d8",
         )
 
 bottom_left_column, bottom_right_column = st.columns((2,3))
