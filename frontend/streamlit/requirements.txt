@@ -6,6 +6,7 @@ openai
 cohere
 pypdf
 flask
+psycopg2
 dbt-bigquery
 metricflow[bigquery]
 # pydantic==2.5.2
