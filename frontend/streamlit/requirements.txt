@@ -6,9 +6,8 @@ openai
 cohere
 pypdf
 flask
-psycopg2
 dbt-bigquery
-metricflow[bigquery]
+metricflow[bigquery]==0.203.1
 # pydantic==2.5.2
 flask-cors
 gcloud
