@@ -145,7 +145,7 @@ def plot_bottom_left():
     x="revenue_total",
     barmode="group",
     text_auto=".2s",
-    title="Best Selling product for Year 2023",
+    title="10 Best Selling Products",
     height=500,
 )
 
