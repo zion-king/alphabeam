@@ -1,18 +1,17 @@
 # tenacity>=8.2.3
-chromadb
-llama_index
-google-generativeai
-cohere
-pypdf
-flask
-gcloud
-trulens-eval
-html2text
-playwright
-plotly
-openai
-pydantic
-streamlit
-flask-cors
-dbt-bigquery
+chromadb==0.4.20
+llama_index==0.9.17
+google-generativeai==0.3.2
+openai==1.6.0 
+cohere==4.39
+pypdf==3.17.3
+flask==3.0.0
+dbt-bigquery==1.7.2
 metricflow[bigquery]
+# pydantic==2.5.2
+flask-cors==4.0.0
+gcloud==0.18.3
+trulens_eval==0.19.2
+html2text>=2020.1.16 
+playwright==1.40.0
+plotly==5.18.0
