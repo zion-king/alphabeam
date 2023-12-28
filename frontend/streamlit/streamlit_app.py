@@ -75,9 +75,9 @@ def merge_table(table1, table2, left_on, right_on):
     return new_df
 
 
-customers = pd.read_csv("frontend\\streamlit\\dataset\\customer.csv")
-products = pd.read_csv("frontend\\streamlit\\dataset\\product.csv")
-sales = pd.read_csv("frontend\\streamlit\\dataset\\sales.csv")
+customers = pd.read_csv("frontend/streamlit/dataset/customer.csv")
+products = pd.read_csv("frontend/streamlit/dataset/product.csv")
+sales = pd.read_csv("frontend/streamlit/dataset/sales.csv")
 
 df = merge_table(merge_table(customers, sales, left_on='customer_key', right_on='customer_key'), products, left_on='product_key', right_on='product_key')
 df["Profit"] = df["revenue_total"] - df["product_cost_total"]      
