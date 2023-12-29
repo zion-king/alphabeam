@@ -1,6 +1,6 @@
 # AlphaBeam Conversational Business Intelligence
 ## About
-AlphaBeam CBI is an avant-garde Conversational Business Intelligence solution, the first of its kind, that redefines data interaction by seamlessly helping business users to explore their data without having to rely on their tech teams every time. While traditional BI tools have empowered data exploration through dashboards and reports, they often cater to a specialized audience, requiring technical expertise and leaving out crucial stakeholders. This results in missed insights, delayed decisions, and a limited understanding of their data's true potential. 
+AlphaBeam CBI is an avant-garde Conversational Business Intelligence solution, the first of its kind, that redefines data interaction by seamlessly helping business users to explore their data without having to rely on their tech teams every time. While traditional BI tools have empowered data exploration through dashboards and reports, they often cater to a specialized audience, requiring technical expertise and leaving out crucial stakeholders. This results in missed insights, delayed decisions, and a limited understanding of their data's true potential.
 
 To address this shortcoming in fostering a truly interactive and user-centric experience for non-technical users, AlphaBeam seamlessly blends conversational capabilities with advanced analytics, creating a symbiotic relationship between business users and their data.
 
@@ -16,10 +16,10 @@ These capabilities empower users to carry out the following:
 
 - **Decision Making at the Speed of Data:** By uncovering hidden trends and patterns through conversational querying, AlphaBeam empowers users to make informed decisions very quickly based on readily available and easily digestible insights.
 
-## Proof of Concept
+## System Design -- Proof of Concept
 AlphaBeam's architecture orchestrates a seamless dialogue between users and their data, unlocking interactive insights through a robust system design. Here's a breakdown of its key components:
 
-### 1. Data Source Integrations
+### 0. Data Source Integrations
 AlphaBeam embraces a wide range of data sources, including batch data, streaming platforms, SQL databases, data warehouses, and external APIs. For this PoC, we have used Google BigQuery to store our data, and integrated it to AlphaBeam to enable us to create the semantic layer using dbt and to fetch data based on user's queries using MetricFlow.
 
 ### 1. Semantic Layer
@@ -46,4 +46,5 @@ The Chat Layer brings the contextual, conversational capabilities of AlphaBeam t
 ## Tech Stack
 ![AlphaBeam_Tech_Stack](https://github.com/zion-king/alphabeam/blob/main/frontend/assets/alphabeam_tech_stack.png)
 
-
+## About our PoC Data
+## Running AlphaBeam Locally
