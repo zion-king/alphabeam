@@ -44,6 +44,7 @@ The Chat Layer brings the contextual, conversational capabilities of AlphaBeam t
 ![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/blob/main/frontend/assets/alphabeam_user_flow.png)
 
 ## Tech Stack
+The following technologies have been used to build the AlphaBeam MVP:
 - **Data store:** Google BigQuery
 - **Semantic and metric layers:** dbt, MetricFlow
 - **Retrieval layer:** Llama-Index, ChromaDB, Cohere, Gemini Pro, TrueLens
