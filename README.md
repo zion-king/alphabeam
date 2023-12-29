@@ -6,30 +6,18 @@ To address this shortcoming in fostering a truly interactive and user-centric ex
 
 ## AlphaBeam Capabilities
 At a glance, AlphaBeam offers businesses and organisations, in particular non-technical stakeholders, a data-agnostic solution to ingest data from different sources, a semantic layer which translates raw data into business vocabularies and user queries into precise metrics and visualizations, a conversational interface for ad-hoc analysis and AI-powered insights through Gemini LLM, and a visualisation layer transforms the retrieved data into compelling dashboards. 
-- **Data Agnostic:** AlphaBeam is able to ingest data from various sources, including databases, APIs, and streaming platforms, making it a one-stop shop for comprehensive analytics.
 
-- **Semantic Understanding:**  Advanced natural language processing (NLP), powered by Gemini Pro, translates user queries into precise metrics and visualizations, eliminating the need for technical expertise.
-
-- **Conversational Interface:**  Users interact with AlphaBeam through a friendly chat interface, fostering intuitive exploration and ad-hoc analytics.
-
-- **AI-Powered Insights:** The AlphaBeam chat engine is powered by Gemini, to extract meaningful insights and generate human-like interpretations of data.
-
-- **Visual Storytelling:**  Advanced dashboarding and visualization capabilities simplifying complex data and creating compelling narratives for effective communication.
-
-## Product Specifications (Proof of Concept)
-The capabilities outlined above empower users to carry out the following:
+These capabilities empower users to carry out the following:
 - **Conversational Inquiries:** Business users can ask questions about already existing dashboards in natural language, just as they would converse with a colleague. They could dig deeper into the data behind the visualizations, gaining a comprehensive understanding of trends and patterns.
 
 - **Comprehensive Metric Exploration:** Engage in a conversational dialogue to uncover insights about any metric or data point, regardless of whether it's currently displayed on the dashboard. AlphaBeam breaks users free from the constraints of pre-defined dashboards and enable them delve into any aspect of their data that piques their curiosity, regardless of their technical background.
 
-- **Visualization on Demand:** Explore data interactively, uncovering hidden trends and patterns through conversational querying.
+- **Visualization on Demand:** AlphaBeam enables stakeholders to explore data interactively, receive accurate and insightful interpretations of visuals and data trends, and generate dynamic visualizations with specific data points for deeper understanding.
 
-- Generate dynamic visualizations with specific data points for deeper understanding.
+**- Decision Making at the Speed of Data:** By uncovering hidden trends and patterns through conversational querying, AlphaBeam empowers users to make informed decisions very quickly based on readily available and easily digestible insights.
 
-- Receive accurate and insightful interpretations of visuals and data trends.
 
-- Quicken decision making based on readily available and easily digestible insights.
-
+## Proof of Concept
 ### 1. Semantic Layer
 The semantic layer 
 ### 2. Metric Layer
