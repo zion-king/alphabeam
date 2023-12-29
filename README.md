@@ -44,12 +44,13 @@ The Chat Layer brings the contextual, conversational capabilities of AlphaBeam t
 ![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/blob/main/frontend/assets/alphabeam_user_flow.png)
 
 ## Tech Stack
-- Data store: Google BigQuery
-- Semantic and metric layers: dbt, MetricFlow
-- Retrieval layer: Llama-Index, ChromaDB, Cohere, Gemini Pro, TrueLens
-- Visualisation layer: Plotly, Streamlit
-- Chat layer: Llama-Index, Gemini Pro
-- Deployment: Streamlit, GCP
+- **Data store:** Google BigQuery
+- **Semantic and metric layers:** dbt, MetricFlow
+- **Retrieval layer:** Llama-Index, ChromaDB, Cohere, Gemini Pro, TrueLens
+- **Visualisation layer:** Plotly, Streamlit
+- **Chat layer:** Llama-Index, Gemini Pro
+- **Deployment:** Streamlit, GCP
+
 ![AlphaBeam_Tech_Stack](https://github.com/zion-king/alphabeam/blob/main/frontend/assets/alphabeam_tech_stack.png)
 
 ## About our PoC Data
