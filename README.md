@@ -19,6 +19,9 @@ These capabilities empower users to carry out the following:
 ## Proof of Concept
 AlphaBeam's architecture orchestrates a seamless dialogue between users and their data, unlocking interactive insights through a robust system design. Here's a breakdown of its key components:
 
+### 1. Data Source Integrations
+AlphaBeam embraces a wide range of data sources, including batch data, streaming platforms, SQL databases, data warehouses, and external APIs. For this PoC, we have used Google BigQuery to store our data, and integrated it to AlphaBeam to enable us to create the semantic layer using dbt and to fetch data based on user's queries using MetricFlow.
+
 ### 1. Semantic Layer
 The Semantic Layer acts as a translator, bridging the gap between raw data and business context. Different semantic models can be employed, each tailored to specific data sources. The Semantic Layer also integrates to the Retrieval Layer to provide semantic search capabilities, enabling users to discover and explore available data based on natural language queries.
 
@@ -41,6 +44,6 @@ The Chat Layer brings the contextual, conversational capabilities of AlphaBeam t
 ![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/frontend/assets/alphabeam_user_flow.png)
 
 ## Tech Stack
-![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/frontend/assets/alphabeam_tech_stack.png)
+![AlphaBeam_Tech_Stack](https://github.com/zion-king/alphabeam/frontend/assets/alphabeam_tech_stack.png)
 
 
