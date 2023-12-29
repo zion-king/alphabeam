@@ -37,10 +37,10 @@ The Visualisation Layer transforms retrieved data into compelling visual narrati
 ### 6. Chat Layer
 The Chat Layer brings the contextual, conversational capabilities of AlphaBeam to the frontend, facilitating a natural language dialogue with the data source. The Chat Layer orchestrates AlphaBeam's conversational flow logic, from interpreting the user's query to determine whether there's an answer, to synthesising responses based on the retrieved data, leveraging the natural language capabilities of Gemini Pro.
 
-## Tech Stack
-
 ## User Flow
+![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/frontend/assets/alphabeam_user_flow.png)
 
-![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/assets/50971444/20ef8796-8925-49ac-97ed-9c57b72f245b)
+## Tech Stack
+![AlphaBeam_User_Flow](https://github.com/zion-king/alphabeam/frontend/assets/alphabeam_tech_stack.png)
 
 
