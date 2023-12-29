@@ -14,17 +14,29 @@ These capabilities empower users to carry out the following:
 
 - **Visualization on Demand:** AlphaBeam enables stakeholders to explore data interactively, receive accurate and insightful interpretations of visuals and data trends, and generate dynamic visualizations with specific data points for deeper understanding.
 
-**- Decision Making at the Speed of Data:** By uncovering hidden trends and patterns through conversational querying, AlphaBeam empowers users to make informed decisions very quickly based on readily available and easily digestible insights.
-
+- **Decision Making at the Speed of Data:** By uncovering hidden trends and patterns through conversational querying, AlphaBeam empowers users to make informed decisions very quickly based on readily available and easily digestible insights.
 
 ## Proof of Concept
+AlphaBeam's architecture orchestrates a seamless dialogue between users and their data, unlocking interactive insights through a robust system design. Here's a breakdown of its key components:
+
 ### 1. Semantic Layer
-The semantic layer 
+The Semantic Layer acts as a translator, bridging the gap between raw data and business context. Different semantic models can be employed, each tailored to specific data sources. The Semantic Layer also integrates to the Retrieval Layer to provide semantic search capabilities, enabling users to discover and explore available data based on natural language queries.
+
 ### 2. Metric Layer
+The Metric Layer is an SQL implementation of the Semantic Layer. It houses the metrics and queries that are needed to fetch data from the source, tailored to the users' unique analytics needs. 
+
 ### 3. Assistants Layer
+The Assistants Layer leverages Gemini to automate the creation of metric queries. When a user asks a question for which the semantic layer shows that there is available data, but the metric required to fetch that data is not available, the Assistant Layers augments the Metric Layer through metric definition and query formulation, and the generated metric is stored in the Metric Layer for subsequent use. Further, the Assistats Layer houses custom functions that are needed to assist in the data retrieval process.
+
 ### 4. Retrieval Layer
+The Retrieval Layer orchestrates Retrieval Augmented Generation (RAG) pipelines, through Llama-Index, to augment Gemini with contextual data. It is first used to transform the Semantic Layer into vector embeddings which are stored in a vector database. When a user asks a question, the Retrieval layer implements semantic search on these embeddings to determine if the question can be answered based on the business ontologies. Further, the Retrieval Layer is used to orchestrate data retrieval by implementing the queries that fetch relevant data from the source and augmenting Gemini with this retrieved data to generate a contextual response.
+
 ### 5. Visualisation / Reporting Layer
+The Visualisation Layer transforms retrieved data into compelling visual narratives. It automates the creation of interactive dashboards and dynamic charts from users' requests. The Visualisation Layer also enables tech teams to configure readily-available dashboards for specific metrics, which users can view at a glance on the interface.
+
 ### 6. Chat Layer
+The Chat Layer brings the contextual, conversational capabilities of AlphaBeam to the frontend, facilitating a natural language dialogue with the data source. The Chat Layer orchestrates AlphaBeam's conversational flow logic, from interpreting the user's query to determine whether there's an answer, to synthesising responses based on the retrieved data, leveraging the natural language capabilities of Gemini Pro.
+
 ## Tech Stack
 
 ## User Flow
