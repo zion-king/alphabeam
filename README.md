@@ -55,4 +55,34 @@ The following technologies have been used to build the AlphaBeam MVP:
 ![AlphaBeam_Tech_Stack](https://github.com/zion-king/alphabeam/blob/main/frontend/assets/alphabeam_tech_stack.png)
 
 ## About our PoC Data
+
+### 0. Data Description
+The PoC data used to display how AlphaBeam works was obtained from the Adventure Works database. We chose this database because it is a typical example of how business data should appear. Because this database contains a huge number of files, we chose only a few files in this database. The chosen files were: 
+- **Customers:** This contains the descriptions of each customer where each row describes each customer.
+- **Products:** This had descriptions of each product where each row describes each product.
+- **Sales:** Each entry described details of each order.
+These files were uploaded on BigQuery before dbt was connected to BigQuery to build the semantic layer and metric layer.
+
+### 1. Building the Semantic Layer and Metric Layer
+Before building the semantic layer with dbt-metricflow, the raw data were modelled using dbt. These modelled datasets acted as the bedrock to the semantic layer where the necessary connections between these datasets were established using the necessary foreign and primary keys. In each semantic model where these relationships were established, we also defined the metrics that would manifest in our data warehouse. It is important to note that we didn't exhaust the metrics that could be defined from the data because we understood that we were building a proof of concept data warehouse. 
+
+Listed below are the metrics currently available:
+- **discount_amount_average**
+- **discount_amount_total**
+- **price_average**
+- **price_total**
+- **product_cost_average**
+- **product_cost_total**
+- **quantity_average**
+- **quantity_total**
+- **revenue_average**
+- **revenue_total**
+
+### 2. Displaying The Metrics on the Streamlit Dashboard
+Among the available metrics in our metric layer, the following metrics were displayed on the dashboard:
+- product_cost_total displayed as **Total Cost**
+- quantity_total displayed as **Total Product Sold**
+- revenue_total displayed as **Total Revenue**
+- Difference between revenue_total and product_cost_total displayed as **Profit Margin**
+
 ## Running AlphaBeam Locally
