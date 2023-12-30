@@ -88,17 +88,16 @@ async def answer_gen(data:LLMRequest):
 
     # run generated MetricFlow command against database
     output = await fetch_data(query, metric_flow_command, app.chat_history)
-    print(output)
-    # if output is not None:
-    #     return JSONResponse({
-    #             "statusCode": 200,
-    #             "result": output
-    #         },status_code=200)
-    # else:
-    #     return JSONResponse({
-    #             "statusCode": 400,
-    #             "result": str(output) + "malformed"
-    #         },status_code=400)
+    if output is not None:
+        return JSONResponse({
+                "statusCode": 200,
+                "result": output
+            },status_code=200)
+    else:
+        return JSONResponse({
+                "statusCode": 400,
+                "result": str(output) + "malformed"
+            },status_code=400)
 
 if __name__ == "__main__":
     gunicorn.run(app,host='0.0.0.0',port=int(appconfig.port))
