@@ -20,6 +20,8 @@ db=None
 async def startup():
     global db
     db = await chroma_dbconn()
+    if isinstance(db, dict):
+        print(db)
     print("Alphabeam::Started")
 
 
