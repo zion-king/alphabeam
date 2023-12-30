@@ -158,9 +158,9 @@ async def semantic_prompt_style():
     return prompt_header   
 
 
-async def query_gen_prompt_style(): 
+def query_gen_prompt_style(): 
 
-    with open("./assistants/mf_few_shot.txt", "r") as f:
+    with open("src/assistants/mf_few_shot.txt", "r") as f:
         # print(file)
         few_shot_examples = f.read()
 
@@ -198,7 +198,7 @@ async def query_gen_prompt_style():
 
     return prompt_header   
 
-async def retrieved_data_prompt_style(llm_query_input):
+def retrieved_data_prompt_style(llm_query_input):
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for 
     conversational business intelligence. Your task is to provide data analysis and interpretation 

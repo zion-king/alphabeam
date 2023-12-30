@@ -19,22 +19,22 @@ from llama_index import download_loader
 from llama_index.text_splitter import TokenTextSplitter
 from llama_index.node_parser import SimpleNodeParser
 from google.oauth2 import service_account
+from  src.config import appconfig
 
 
-GOOGLE_API_KEY = 'AIzaSyB4Aew8oVjBgPMZlskdhdmQs27DuyNBDAY'
-os.environ["GOOGLE_API_KEY"]  = GOOGLE_API_KEY
+
 
 genai.configure(
-    api_key=GOOGLE_API_KEY,
+    api_key=appconfig.google_key,
     client_options={"api_endpoint": "generativelanguage.googleapis.com"},
 )
 
-CHROMADB_HOST = "localhost"
+
 ALLOWED_EXTENSIONS = {'txt', 'htm', 'html', 'csv', 'yml', 'sql'}
 
 
 class YMLReader(BaseReader):
-    async def load_data(self, file, extra_info=None):
+    def load_data(self, file, extra_info=None):
         with open(file, "r") as f:
             print(file)
             text = f.read()
@@ -42,7 +42,7 @@ class YMLReader(BaseReader):
         return [Document(text=text + "Foobar", extra_info={"filename": str(file), "file_type": ".yml"})]
         
 class SQLReader(BaseReader):
-    async def load_data(self, file, extra_info=None):
+    def load_data(self, file, extra_info=None):
         with open(file, "r") as f:
             print(file)
             text = f.read()
@@ -50,16 +50,7 @@ class SQLReader(BaseReader):
         return [Document(text=text + "Foobar", extra_info={"filename": str(file), "file_type": ".sql"})]
 
 
-async def generate_vector_embedding_chroma(index_name, data_dir):
-        
-    try:
-        # initialize client, setting path to save data
-        # db = chromadb.PersistentClient(path="./chroma_db")
-        print("Connecting to Chroma database...")
-        db = chromadb.HttpClient(host=CHROMADB_HOST, port=8000)
-    except:
-        return {'statusCode': 400, 'status': 'Could not connect to chroma database'}
-
+def generate_vector_embedding_chroma(db,index_name, data_dir):
     try:
         # create collection
         print("Creating vector embeddings......")
@@ -80,8 +71,8 @@ async def generate_vector_embedding_chroma(index_name, data_dir):
         vector_store=vector_store
     )
 
-    llm = Gemini(api_key=GOOGLE_API_KEY, model='models/gemini-pro', temperature=0)
-    embed_model = GeminiEmbedding(api_key=GOOGLE_API_KEY)
+    llm = Gemini(api_key=appconfig.google_key, model=appconfig.llm_model, temperature=0)
+    embed_model = GeminiEmbedding(api_key=appconfig.google_key)
     node_parser = SimpleNodeParser.from_defaults(
         # text_splitter=TokenTextSplitter(chunk_size=1024, chunk_overlap=20)
         chunk_size=1024,
@@ -119,8 +110,8 @@ async def generate_vector_embedding_google(index_name, data_dir):
     start_time = time.time()
     vector_store = GoogleVectorStore.create_corpus(corpus_id=index_name) # param:display_name
 
-    llm = Gemini(model='models/gemini-pro', temperature=0)
-    embed_model = GeminiEmbedding(api_key=GOOGLE_API_KEY)
+    llm = Gemini(model=appconfig.llm_model, temperature=0)
+    embed_model = GeminiEmbedding(api_key=appconfig.google_key)
     node_parser = SimpleNodeParser.from_defaults(
         chunk_size=1024,
         chunk_overlap=20

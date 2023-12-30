@@ -4,6 +4,8 @@ from src.retrieval.semantic_retrieval import *
 import gunicorn
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from  src.config import appconfig
+from src.config.chroma_dbconn import chroma_dbconn
 
 class LLMRequest(BaseModel):
     projectName: str
@@ -12,10 +14,14 @@ class LLMRequest(BaseModel):
 
 app = FastAPI()
 
+db=None
 
 @app.on_event("startup")
 async def startup():
+    global db
+    db = await chroma_dbconn()
     print("Alphabeam::Started")
+
 
 origins = [
     "*",
@@ -38,25 +44,22 @@ async def health():
       'message': "endpoint working"
     }
 
-# @app.post('/embedding')
-# async async def process():    
-#     if request.method == 'POST':
-#         project_name = request.form['projectName']
-#         index_name = project_name.replace(' ', '_').lower() + '_embeddings'
-        
-#         for i in ["marts","metrics","semantic_models"]:
-#             data_dir = f'./semantics/models/{i}/'
-#             await generate_vector_embedding_chroma(index_name, data_dir)
-        
-#         # add metricflow documentation to semantic embeddings
-#         await generate_vector_embedding_chroma(index_name, "./retrieval/metric_flow_docs/")
+@app.post('/embedding')
+async def process(projectName:str):
+    project_name = projectName
+    index_name = project_name.replace(' ', '_').lower() + '_embeddings'
+    
+    for i in ["marts","metrics","semantic_models"]:
+        data_dir = appconfig.semantic_model_path+f'{i}/'
+        generate_vector_embedding_chroma(db,index_name, data_dir)
+    
+    # add metricflow documentation to semantic embeddings
+    generate_vector_embedding_chroma(db,index_name, appconfig.metric_flow_path)
 
-#         response = {
-#             'statusCode': 200,
-#             'status': 'Vector embeddings created and stored successfully!',
-#         }
-#         return response
-#     return render_template('index.html')
+    return  JSONResponse({
+        'statusCode': 200,
+        'status': 'Vector embeddings created and stored successfully!',
+    },status_code=200)
 
 
 @app.post("/retrieval")
@@ -94,4 +97,4 @@ async def answer_gen(data:LLMRequest):
             },status_code=400)
 
 if __name__ == "__main__":
-    gunicorn.run(app,host='0.0.0.0',port=7000)
+    gunicorn.run(app,host='0.0.0.0',port=int(appconfig.port))

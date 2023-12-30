@@ -90,7 +90,6 @@ async def llm_run_query_cmd(llm_query_input: str, temp_dir):
         with open(temp_file, "r") as f:
             print('Extracting data from database\n', f.read())
         return temp_dir
-                                
     except Exception as e:
         print("Lots of encoding errors!!!")
         return None
