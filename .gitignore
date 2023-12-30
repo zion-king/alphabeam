@@ -1,3 +1,4 @@
 alphenv/
 .env
 *.pyc
+chroma.log
