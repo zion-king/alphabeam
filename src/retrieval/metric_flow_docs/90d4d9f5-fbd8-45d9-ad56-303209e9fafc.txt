@@ -27,11 +27,11 @@
   
 
 
-Once you async async define metrics in your dbt project, you can query metrics, dimensions, and dimension values, and validate your configs using the MetricFlow commands.
-MetricFlow allows you to async async define and query metrics in your dbt project in the dbt Cloud CLI, dbt Cloud IDE, or dbt Core. To experience the power of the universal dbt Semantic Layer and dynamically query those metrics in downstream tools, you'll need a dbt Cloud Team or Enterprise account.
+Once you define metrics in your dbt project, you can query metrics, dimensions, and dimension values, and validate your configs using the MetricFlow commands.
+MetricFlow allows you to define and query metrics in your dbt project in the dbt Cloud CLI, dbt Cloud IDE, or dbt Core. To experience the power of the universal dbt Semantic Layer and dynamically query those metrics in downstream tools, you'll need a dbt Cloud Team or Enterprise account.
 MetricFlow is compatible with Python versions 3.8, 3.9, 3.10, and 3.11.
 
-MetricFlow is a dbt package that allows you to async async define and query metrics in your dbt project. You can use MetricFlow to query metrics in your dbt project in the dbt Cloud CLI, dbt Cloud IDE, or dbt Core.
+MetricFlow is a dbt package that allows you to define and query metrics in your dbt project. You can use MetricFlow to query metrics in your dbt project in the dbt Cloud CLI, dbt Cloud IDE, or dbt Core.
 Using MetricFlow with dbt Cloud means you won't need to manage versioning — your dbt Cloud account will automatically manage the versioning.
 dbt Cloud jobs — MetricFlow commands aren't supported in dbt Cloud jobs yet. However, you can add MetricFlow validations with your git provider (such as GitHub Actions) by installing MetricFlow (python -m pip install metricflow). This allows you to run MetricFlow commands as part of your continuous integration checks on PRs.
 
@@ -48,7 +48,7 @@ You can create metrics using MetricFlow in the dbt Cloud IDE. However, support f
 
 
 :::info Use dbt Cloud CLI for semantic layer development
-Use the dbt Cloud CLI for the experience in async async defining and querying metrics in your dbt project on dbt Cloud or dbt Core with MetricFlow.
+Use the dbt Cloud CLI for the experience in defining and querying metrics in your dbt project on dbt Cloud or dbt Core with MetricFlow.
 A benefit to using the dbt Cloud is that you won't need to manage versioning — your dbt Cloud account will automatically manage the versioning.
 :::
 You can install MetricFlow from PyPI. You need to use pip to install MetricFlow on Windows or Linux operating systems:
@@ -141,13 +141,13 @@ Options:
   --metrics SEQUENCE  List entities by given metrics (intersection). Ex. --metrics bookings,messages
   --help              Show this message and exit.
 Validate-configs
-The following command performs validations against the async async defined semantic model configurations.
+The following command performs validations against the defined semantic model configurations.
 Note, in dbt Cloud you don't need to validate the Semantic Layer config separately. Running a dbt command (such as dbt parse, dbt build, dbt compile, dbt run) automatically checks it.
 mf validate-configs # In dbt Core
 
 Options:
   --dw-timeout INTEGER            Optional timeout for data warehouse
-                                  validation steps. async async default None.
+                                  validation steps. default None.
   --skip-dw                       If specified, skips the data warehouse
                                   validations
   --show-all                      If specified, prints warnings and future-
@@ -405,6 +405,6 @@ Keep in mind that modifying your shell configuration files can have an impact on
 
 
 Why is my query limited to 100 rows in the dbt Cloud CLI? 
-The async async default limit for query issues from the dbt Cloud CLI is 100 rows. We set this async async default to prevent returning unnecessarily large data sets as the dbt Cloud CLI is typically used to query the dbt Semantic Layer during the development process, not for production reporting or to access large data sets. For most workflows, you only need to return a subset of the data.
+The default limit for query issues from the dbt Cloud CLI is 100 rows. We set this default to prevent returning unnecessarily large data sets as the dbt Cloud CLI is typically used to query the dbt Semantic Layer during the development process, not for production reporting or to access large data sets. For most workflows, you only need to return a subset of the data.
 However, you can change this limit if needed by setting the --limit option in your query. For example, to return 1000 rows, you can run dbt sl list metrics --limit 1000.
 

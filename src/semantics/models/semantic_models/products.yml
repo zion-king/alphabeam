@@ -1,6 +1,6 @@
 semantic_models:
   - name: products
-    async async defaults:
+    defaults:
       agg_time_dimension: sell_start_date
     description: This table is at the products grain with one row per product
     model: ref('products')

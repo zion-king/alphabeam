@@ -50,10 +50,10 @@ class ReadabilityWebPageReader(BaseReader):
     2. Inject Readability.js to extract the main content.
 
     Args:
-        proxy (Optional[str], optional): Proxy server. async async defaults to None.
-        wait_until (Optional[Literal["commit", "domcontentloaded", "load", "networkidle"]], optional): Wait until the page is loaded. async async defaults to "domcontentloaded".
-        text_splitter (TextSplitter, optional): Text splitter. async async defaults to None.
-        normalizer (Optional[Callable[[str], str]], optional): Text normalizer. async async defaults to nfkc_normalize.
+        proxy (Optional[str], optional): Proxy server. defaults to None.
+        wait_until (Optional[Literal["commit", "domcontentloaded", "load", "networkidle"]], optional): Wait until the page is loaded. defaults to "domcontentloaded".
+        text_splitter (TextSplitter, optional): Text splitter. defaults to None.
+        normalizer (Optional[Callable[[str], str]], optional): Text normalizer. defaults to nfkc_normalize.
     """
 
     async def __init__(
@@ -288,7 +288,7 @@ class BeautifulSoupWebReader(BaseReader):
     Args:
         website_extractor (Optional[Dict[str, Callable]]): A mapping of website
             hostname (e.g. google.com) to a function that specifies how to
-            extract text from the BeautifulSoup obj. See async async defAULT_WEBSITE_EXTRACTOR.
+            extract text from the BeautifulSoup obj. See defAULT_WEBSITE_EXTRACTOR.
     """
 
     async def __init__(
