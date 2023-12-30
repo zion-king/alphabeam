@@ -10,15 +10,14 @@ from llama_index.indices.postprocessor import LLMRerank, CohereRerank
 from src.assistants.functions import *
 from src.utils.embedding_utils import *
 from llama_index.utils import truncate_text
-
+from src.config import appconfig
 import warnings
 warnings.filterwarnings("ignore")
 
-GOOGLE_API_KEY = 'AIzaSyB4Aew8oVjBgPMZlskdhdmQs27DuyNBDAY'
-os.environ["GOOGLE_API_KEY"]  = GOOGLE_API_KEY
+
 
 genai.configure(
-    api_key=GOOGLE_API_KEY,
+    api_key=appconfig.google_key,
     client_options={"api_endpoint": "generativelanguage.googleapis.com"},
 )
 
@@ -26,51 +25,42 @@ CHROMADB_HOST = "localhost"
 COHERE_RERANK_KEY = 'p8K3ASZaficAE1YlOh9dAY3x5Tkxa8sOmCRtJOtP'
 
 
-async def get_index_from_vector_db(index_name):
-    
-    try:
-        # initialize client
-        db = chromadb.HttpClient(host=CHROMADB_HOST, port=8000)
-    except Exception as e:
-        print('<<< get_index_from_vector_db() >>> Could not connect to database!\n', e)
-        return None, None
-    
-    # get collection and embedding size
+async def get_index_from_vector_db(db,index_name):
     try:
         chroma_collection = db.get_collection(index_name)
         doc_size = chroma_collection.count()
         print('Computing knowledge base size...', doc_size)
+
+        start_time = time.time()
+        vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+        storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
+        context_window=32000 if doc_size>300 else 16000
+        embed_model = GeminiEmbedding(api_key=appconfig.google_key)
+        llm = Gemini(api_key=appconfig.google_key, model=appconfig.llm_model, temperature=0)
+        print_msg = "Using Gemini Pro..."
+        print(print_msg)
+
+        service_context = ServiceContext.from_defaults(
+            llm=llm,
+            context_window=context_window, 
+            embed_model=embed_model,
+            chunk_size=1024,
+            chunk_overlap=20
+        )
+
+        print('Retrieving knowledge base index from ChromaDB...')
+        index = VectorStoreIndex.from_vector_store(
+            vector_store=vector_store, 
+            storage_context=storage_context,
+            service_context=service_context
+        )
+
+        print(f'Index retrieved from ChromaDB in {time.time() - start_time} seconds.')
+        return index, doc_size
     except Exception as e:
         print(e)
         return None, None
-
-    start_time = time.time()
-    vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-    storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-    context_window=32000 if doc_size>300 else 16000
-    embed_model = GeminiEmbedding(api_key=GOOGLE_API_KEY)
-    llm = Gemini(api_key=GOOGLE_API_KEY, model='models/gemini-pro', temperature=0)
-    print_msg = "Using Gemini Pro..."
-    print(print_msg)
-
-    service_context = ServiceContext.from_defaults(
-        llm=llm,
-        context_window=context_window, 
-        embed_model=embed_model,
-        chunk_size=1024,
-        chunk_overlap=20
-    )
-
-    print('Retrieving knowledge base index from ChromaDB...')
-    index = VectorStoreIndex.from_vector_store(
-        vector_store=vector_store, 
-        storage_context=storage_context,
-        service_context=service_context
-    )
-
-    print(f'Index retrieved from ChromaDB in {time.time() - start_time} seconds.')
-    return index, doc_size
 
 async def postprocessor_args(doc_size):
     if doc_size<30:
@@ -82,7 +72,7 @@ async def postprocessor_args(doc_size):
     cohere_rerank = CohereRerank(api_key=COHERE_RERANK_KEY, top_n=30)
 
     # slower postprocessor
-    embed_model = GeminiEmbedding(api_key=GOOGLE_API_KEY)
+    embed_model = GeminiEmbedding(api_key=appconfig.google_key)
     service_context = ServiceContext.from_defaults(llm=None, embed_model=embed_model, chunk_size=256, chunk_overlap=20) # use llama_index async default MockLLM (faster)
 
     rank_postprocessor = LLMRerank(
@@ -217,33 +207,33 @@ def retrieved_data_prompt_style(llm_query_input):
     return prompt_header   
 
 
-async def answer_query_stream(query, index_name, prompt_style):
-
-    index, doc_size = await get_index_from_vector_db(index_name)
-
-    if index is None:
-        response = "Requested information not found"
-        return response
-    else:
-        node_postprocessors = await postprocessor_args(doc_size)
-        similarity_top_k = 200 if doc_size>200 else doc_size
-        chat_engine = index.as_chat_engine(chat_mode="context", 
-                                            # memory=chat_history, # shouldn't retain chat history here
-                                            system_prompt=prompt_style, 
-                                            similarity_top_k=similarity_top_k,
-                                            function_call="query_engine_tool",
-                                            node_postprocessors=node_postprocessors
-                                            )
-
-        message_body = f"""\nUse the tool to answer:\n{query}\n"""
-        response = chat_engine.chat(message_body)
-        
-        if response is None:
-            chat_response = "I'm sorry I couldn't find an answer to the requested information in your semantic knowledge base. Please rephrase your question and try again."
-            return chat_response
+async def answer_query_stream(db,query, index_name, prompt_style):
+    try:
+        index, doc_size = await get_index_from_vector_db(db,index_name)
+        if index is None:
+            response = "Requested information not found"
+            return response
         else:
-            print('Starting response stream...\n...........................\n...........................')
-            return f'''{response.response}'''
+            node_postprocessors = await postprocessor_args(doc_size)
+            similarity_top_k = 200 if doc_size>200 else doc_size
+            chat_engine = index.as_chat_engine(chat_mode="context", 
+                                                # memory=chat_history, # shouldn't retain chat history here
+                                                system_prompt=prompt_style, 
+                                                similarity_top_k=similarity_top_k,
+                                                function_call="query_engine_tool",
+                                                node_postprocessors=node_postprocessors
+                                                )
+
+            message_body = f"""\nUse the tool to answer:\n{query}\n"""
+            response = chat_engine.chat(message_body)
+            if response is None:
+                chat_response = "I'm sorry I couldn't find an answer to the requested information in your semantic knowledge base. Please rephrase your question and try again."
+                return chat_response
+            else:
+                print('Starting response stream...\n...........................\n...........................')
+                return f'''{response.response}'''
+    except Exception as e:
+        print(e)
 
 
 async def fetch_data(user_query, llm_query_input, chat_history):

@@ -75,7 +75,6 @@ async def answer_gen(data:LLMRequest):
         app.chat_history = await init_chat_history()
 
     query = data.query
-
     # query semantic layer to check whether information exists
     # we will revist this layer... more prompt tuning required
     # answer_exists = answer_query_stream(query, index_name, semantic_prompt_style())
@@ -84,21 +83,22 @@ async def answer_gen(data:LLMRequest):
     #     return "The source data doesn't contain the requested information. Please rephrase your question or ask me another question."
     
     # use semantic and metric layers to assist Gemini to generate MetricFlow command to retrieve the data
-    metrif_flow_command = await answer_query_stream(query, index_name, query_gen_prompt_style())
-    print("Got command >>>", metrif_flow_command)
+    metric_flow_command = await answer_query_stream(db,query, index_name, query_gen_prompt_style())
+    print("Got command >>>", metric_flow_command)
 
     # run generated MetricFlow command against database
-    output = await fetch_data(query, metrif_flow_command, app.chat_history)
-    if output is not None:
-        return JSONResponse({
-                "statusCode": 200,
-                "result": output
-            },status_code=200)
-    else:
-        return JSONResponse({
-                "statusCode": 400,
-                "result": str(output) + "malformed"
-            },status_code=400)
+    output = await fetch_data(query, metric_flow_command, app.chat_history)
+    print(output)
+    # if output is not None:
+    #     return JSONResponse({
+    #             "statusCode": 200,
+    #             "result": output
+    #         },status_code=200)
+    # else:
+    #     return JSONResponse({
+    #             "statusCode": 400,
+    #             "result": str(output) + "malformed"
+    #         },status_code=400)
 
 if __name__ == "__main__":
     gunicorn.run(app,host='0.0.0.0',port=int(appconfig.port))

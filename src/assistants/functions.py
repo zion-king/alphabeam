@@ -81,7 +81,7 @@ async def llm_run_query_cmd(llm_query_input: str, temp_dir):
     try:
         temp_file = f"{temp_dir}/query_temp_records.txt"
         output = subprocess.run(llm_query_input+" >"+temp_file, 
-                            cwd="./semantics/",
+                            cwd="src/semantics/",
                             text=True, 
                             shell=True, 
                             encoding="utf-8",
