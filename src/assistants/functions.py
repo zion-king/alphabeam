@@ -1,10 +1,5 @@
-import sys
-import io
-import os
-import re
-import json
-import tempfile
-import subprocess
+
+import re,json,subprocess
 import google.auth
 from metricflow import MetricFlowClient
 from dbt.adapters.bigquery import Plugin
@@ -106,7 +101,7 @@ async def llm_run_query_func(llm_query_input: str):
         credentials=credentials,
         )
 
-    semantic_manifest = json.load(open("./semantics/target/semantic_manifest.json"))
+    semantic_manifest = json.load(open("src/semantics/target/semantic_manifest.json"))
 
     semantic_manifest = RecursiveAttrDict(semantic_manifest)
     mfc = MetricFlowClient(sql_client, semantic_manifest)

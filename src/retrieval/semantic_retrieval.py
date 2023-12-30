@@ -14,17 +14,13 @@ from src.config import appconfig
 import warnings
 warnings.filterwarnings("ignore")
 
-
-
+# Configure the generative AI with the API key and endpoint
 genai.configure(
     api_key=appconfig.google_key,
     client_options={"api_endpoint": "generativelanguage.googleapis.com"},
 )
 
-CHROMADB_HOST = "localhost"
-COHERE_RERANK_KEY = 'p8K3ASZaficAE1YlOh9dAY3x5Tkxa8sOmCRtJOtP'
-
-
+# Function to retrieve index from vector database
 async def get_index_from_vector_db(db,index_name):
     try:
         chroma_collection = db.get_collection(index_name)
@@ -62,6 +58,7 @@ async def get_index_from_vector_db(db,index_name):
         print(e)
         return None, None
 
+# Function to set postprocessor arguments based on document size
 async def postprocessor_args(doc_size):
     if doc_size<30:
         return None
@@ -69,7 +66,7 @@ async def postprocessor_args(doc_size):
     print('Optimising context information...')
     
     # fastest postprocessor
-    cohere_rerank = CohereRerank(api_key=COHERE_RERANK_KEY, top_n=30)
+    cohere_rerank = CohereRerank(api_key=appconfig.cohere_rerank_key, top_n=30)
 
     # slower postprocessor
     embed_model = GeminiEmbedding(api_key=appconfig.google_key)
@@ -93,13 +90,12 @@ async def postprocessor_args(doc_size):
 
     return node_postprocessors
 
-
+# Function to parse choice select answer
 async def parse_choice_select_answer_fn(
     answer: str, num_choices: int, raise_error: bool = False
 ):
     """async default parse choice select answer function."""
     answer_lines = answer.split("\n")
-    # print(answer_lines)
     answer_nums = []
     answer_relevances = []
     for answer_line in answer_lines:
@@ -119,10 +115,9 @@ async def parse_choice_select_answer_fn(
                 continue
             answer_nums.append(answer_num)
             answer_relevances.append(float(line_tokens[1].split(":")[1].strip()))
-    # print(answer_nums)
     return answer_nums, answer_relevances
 
-
+# Function to get formatted sources
 async def get_formatted_sources(response, length=100, trim_text=True) -> str:
     """Get formatted sources text."""
     texts = []
@@ -130,13 +125,12 @@ async def get_formatted_sources(response, length=100, trim_text=True) -> str:
         fmt_text_chunk = source_node.node.get_content()
         if trim_text:
             fmt_text_chunk = truncate_text(fmt_text_chunk, length)
-        # node_id = source_node.node.node_id or "None"
         node_id = source_node.node.metadata['page_label'] or "None"
         source_text = f"> Source (Page no: {node_id}): {fmt_text_chunk}"
         texts.append(source_text)
     return "\n\n".join(texts)
 
-
+# Function to set semantic prompt style
 async def semantic_prompt_style(): 
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for conversational business intelligence.
@@ -147,11 +141,10 @@ async def semantic_prompt_style():
 
     return prompt_header   
 
-
+# Function to set query generation prompt style
 def query_gen_prompt_style(): 
 
     with open("src/assistants/mf_few_shot.txt", "r") as f:
-        # print(file)
         few_shot_examples = f.read()
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for conversational business intelligence. 
@@ -178,16 +171,10 @@ def query_gen_prompt_style():
        - In your --group-by, where, or --order expressions, don't ever use only dimension names without linking with the table name.
     Return only this command without any further explanation, or return "Null" if the provided information is not sufficient to answer the question.
     """
-    # The measures, dimensions, tables and other parameters referenced in the above examples are 
-    # obtained from the knowledege base provided below. 
-     
-    # The general syntax for the MetricFlow query command is:
-    # `mf query --metrics <measure(s)> --group-by <table-1__dimension-1,table-1__dimension-2,...,table-n__dimension-n> --where <condition> --start-time 'YYYY-MM-DD' --end-time 'YYYY-MM-DD' --order <table__dimension> --limit <int>`
-
-    # 3. Which dimensions in the tables contain the required data?
 
     return prompt_header   
 
+# Function to set retrieved data prompt style
 def retrieved_data_prompt_style(llm_query_input):
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for 
@@ -206,7 +193,7 @@ def retrieved_data_prompt_style(llm_query_input):
 
     return prompt_header   
 
-
+# Function to answer query stream
 async def answer_query_stream(db,query, index_name, prompt_style):
     try:
         index, doc_size = await get_index_from_vector_db(db,index_name)
@@ -217,7 +204,6 @@ async def answer_query_stream(db,query, index_name, prompt_style):
             node_postprocessors = await postprocessor_args(doc_size)
             similarity_top_k = 200 if doc_size>200 else doc_size
             chat_engine = index.as_chat_engine(chat_mode="context", 
-                                                # memory=chat_history, # shouldn't retain chat history here
                                                 system_prompt=prompt_style, 
                                                 similarity_top_k=similarity_top_k,
                                                 function_call="query_engine_tool",
@@ -235,7 +221,7 @@ async def answer_query_stream(db,query, index_name, prompt_style):
     except Exception as e:
         print(e)
 
-
+# Function to fetch data
 async def fetch_data(user_query, llm_query_input, chat_history):
     
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -245,7 +231,6 @@ async def fetch_data(user_query, llm_query_input, chat_history):
             return "Could not fetch data from the database. Please try again and if the problem persists, inform your IT team."
         
         doc = SimpleDirectoryReader(input_dir=query_output_dir).load_data()
-    # doc = SimpleDirectoryReader(input_dir="./retrieval/data").load_data()
 
     service_context = ServiceContext.from_defaults(
         llm=Gemini(model='models/gemini-pro', temperature=0),
@@ -261,7 +246,6 @@ async def fetch_data(user_query, llm_query_input, chat_history):
                                         system_prompt=retrieved_data_prompt_style(llm_query_input), 
                                         similarity_top_k=30,
                                         verbose=True, 
-                                        # streaming=True,
                                         function_call="query_engine_tool",
                                         )
 
@@ -276,19 +260,7 @@ async def fetch_data(user_query, llm_query_input, chat_history):
         print('Starting response stream...\n...........................\n...........................')
         return response.response
 
+# Function to initialize chat history
 async def init_chat_history():
     new_conversation_state = ChatMemoryBuffer.from_defaults(token_limit=50000)
     return new_conversation_state
-
-
-
-
-
-
-
-
-
-
-
-
-
