@@ -1,6 +1,6 @@
 semantic_models:
   - name: customers
-    defaults:
+    async async defaults:
       agg_time_dimension: birth_date
     description: This table is at the customers grain with one row per customer
     model: ref('customers')

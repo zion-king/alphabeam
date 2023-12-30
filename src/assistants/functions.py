@@ -16,19 +16,19 @@ from typing import Any, List, Dict, Optional, Tuple
 import warnings
 warnings.filterwarnings("ignore")
 
-# sys.setdefaultencoding("utf-8")
+# sys.setasync defaultencoding("utf-8")
 # os.environ("PYTHONIOENCODING") = "utf-8"
 
 class AttrDict(dict):
-    def __getattr__(self, key):
+    async def __getattr__(self, key):
         return self[key]
 
-    def __setattr__(self, key, value):
+    async def __setattr__(self, key, value):
         self[key] = value
 
 
 class RecursiveAttrDict(dict):
-    def __init__(self, data):
+    async def __init__(self, data):
         super().__init__(data)
         for key, value in self.items():
             if isinstance(value, dict):
@@ -39,20 +39,20 @@ class RecursiveAttrDict(dict):
                     for item in value
                 ]  # Apply to items in lists of dicts
 
-    def __getattr__(self, key):
+    async def __getattr__(self, key):
         try:
             return self[key]
         except KeyError:
             raise AttributeError(f"No attribute '{key}' found")
 
-    def __setattr__(self, key, value):
+    async def __setattr__(self, key, value):
         if isinstance(value, dict):
             self[key] = RecursiveAttrDict(value)  # Ensure nested dicts are also AttrDicts
         else:
             self[key] = value
 
 
-def run_query(metrics: List[str],
+async def run_query(metrics: List[str],
     tables: List[str],
     # tables_and_dims: List[str],
     group_by: List[str] = None,
@@ -77,7 +77,7 @@ def run_query(metrics: List[str],
     return output
 
 
-def llm_run_query_cmd(llm_query_input: str, temp_dir):
+async def llm_run_query_cmd(llm_query_input: str, temp_dir):
     try:
         temp_file = f"{temp_dir}/query_temp_records.txt"
         output = subprocess.run(llm_query_input+" >"+temp_file, 
@@ -96,7 +96,7 @@ def llm_run_query_cmd(llm_query_input: str, temp_dir):
         return None
 
 
-def llm_run_query_func(llm_query_input: str):
+async def llm_run_query_func(llm_query_input: str):
     mf_params = decompose_metricflow_command(llm_query_input)
     print(mf_params)
 
@@ -125,7 +125,7 @@ def llm_run_query_func(llm_query_input: str):
     return mf_query_function
 
 
-def decompose_metricflow_command(command_string):
+async def decompose_metricflow_command(command_string):
    """Decomposes a MetricFlow command string into input parameters for a query function.
 
    Args:

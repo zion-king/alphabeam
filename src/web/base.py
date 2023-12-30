@@ -36,7 +36,7 @@ inject_readability = f"""
 """
 
 
-def nfkc_normalize(text: str) -> str:
+async def nfkc_normalize(text: str) -> str:
     return unicodedata.normalize("NFKC", text)
 
 
@@ -50,13 +50,13 @@ class ReadabilityWebPageReader(BaseReader):
     2. Inject Readability.js to extract the main content.
 
     Args:
-        proxy (Optional[str], optional): Proxy server. Defaults to None.
-        wait_until (Optional[Literal["commit", "domcontentloaded", "load", "networkidle"]], optional): Wait until the page is loaded. Defaults to "domcontentloaded".
-        text_splitter (TextSplitter, optional): Text splitter. Defaults to None.
-        normalizer (Optional[Callable[[str], str]], optional): Text normalizer. Defaults to nfkc_normalize.
+        proxy (Optional[str], optional): Proxy server. async async defaults to None.
+        wait_until (Optional[Literal["commit", "domcontentloaded", "load", "networkidle"]], optional): Wait until the page is loaded. async async defaults to "domcontentloaded".
+        text_splitter (TextSplitter, optional): Text splitter. async async defaults to None.
+        normalizer (Optional[Callable[[str], str]], optional): Text normalizer. async async defaults to nfkc_normalize.
     """
 
-    def __init__(
+    async def __init__(
         self,
         proxy: Optional[str] = None,
         wait_until: Optional[
@@ -76,7 +76,7 @@ class ReadabilityWebPageReader(BaseReader):
         self._text_splitter = text_splitter
         self._normalize = normalize
 
-    def load_data(self, url: str) -> List[Document]:
+    async def load_data(self, url: str) -> List[Document]:
         """render and load data content from url.
 
         Args:
@@ -120,7 +120,7 @@ class ReadabilityWebPageReader(BaseReader):
 
             return [Document(text=x, extra_info=extra_info) for x in texts]
 
-    def scrape_page(
+    async def scrape_page(
         self,
         browser: Any,
         url: str,
@@ -158,7 +158,7 @@ class ReadabilityWebPageReader(BaseReader):
 
         return r
 
-def _substack_reader(soup: Any, **kwargs) -> Tuple[str, Dict[str, Any]]:
+async def _substack_reader(soup: Any, **kwargs) -> Tuple[str, Dict[str, Any]]:
     """Extract text from Substack blog post."""
     extra_info = {
         "Title of this Substack post": soup.select_one("h1.post-title").getText(),
@@ -169,7 +169,7 @@ def _substack_reader(soup: Any, **kwargs) -> Tuple[str, Dict[str, Any]]:
     return text, extra_info
 
 
-def _readthedocs_reader(soup: Any, url: str, **kwargs) -> Tuple[str, Dict[str, Any]]:
+async def _readthedocs_reader(soup: Any, url: str, **kwargs) -> Tuple[str, Dict[str, Any]]:
     """Extract text from a ReadTheDocs documentation site"""
     import requests
     from bs4 import BeautifulSoup
@@ -197,7 +197,7 @@ def _readthedocs_reader(soup: Any, url: str, **kwargs) -> Tuple[str, Dict[str, A
     return "\n".join(texts), {}
 
 
-def _readmedocs_reader(
+async def _readmedocs_reader(
     soup: Any, url: str, include_url_in_text: bool = True
 ) -> Tuple[str, Dict[str, Any]]:
     """Extract text from a ReadMe documentation site"""
@@ -239,7 +239,7 @@ def _readmedocs_reader(
     return "\n".join(texts), {}
 
 
-def _gitbook_reader(
+async def _gitbook_reader(
     soup: Any, url: str, include_url_in_text: bool = True
 ) -> Tuple[str, Dict[str, Any]]:
     """Extract text from a ReadMe documentation site"""
@@ -269,7 +269,7 @@ def _gitbook_reader(
     return "\n".join(texts), {}
 
 
-DEFAULT_WEBSITE_EXTRACTOR: Dict[
+defAULT_WEBSITE_EXTRACTOR: Dict[
     str, Callable[[Any, str], Tuple[str, Dict[str, Any]]]
 ] = {
     "substack.com": _substack_reader,
@@ -288,17 +288,17 @@ class BeautifulSoupWebReader(BaseReader):
     Args:
         website_extractor (Optional[Dict[str, Callable]]): A mapping of website
             hostname (e.g. google.com) to a function that specifies how to
-            extract text from the BeautifulSoup obj. See DEFAULT_WEBSITE_EXTRACTOR.
+            extract text from the BeautifulSoup obj. See async async defAULT_WEBSITE_EXTRACTOR.
     """
 
-    def __init__(
+    async def __init__(
         self,
         website_extractor: Optional[Dict[str, Callable]] = None,
     ) -> None:
         """Initialize with parameters."""
-        self.website_extractor = website_extractor or DEFAULT_WEBSITE_EXTRACTOR
+        self.website_extractor = website_extractor or defAULT_WEBSITE_EXTRACTOR
 
-    def load_data(
+    async def load_data(
         self,
         urls: List[str],
         custom_hostname: Optional[str] = None,
@@ -360,11 +360,11 @@ class SimpleWebPageReader(BaseReader):
 
     """
 
-    def __init__(self, html_to_text: bool = False) -> None:
+    async def __init__(self, html_to_text: bool = False) -> None:
         """Initialize with parameters."""
         self._html_to_text = html_to_text
 
-    def load_data(self, urls: List[str]) -> List[Document]:
+    async def load_data(self, urls: List[str]) -> List[Document]:
         """Load data from the input directory.
 
         Args:

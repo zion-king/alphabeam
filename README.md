@@ -1,6 +1,6 @@
 # AlphaBeam Conversational Business Intelligence
 ## 1. About
-AlphaBeam CBI is an avant-garde Conversational Business Intelligence solution, the first of its kind, that redefines data interaction by seamlessly helping business users to explore their data without having to rely on their tech teams every time. While traditional BI tools have empowered data exploration through dashboards and reports, they often cater to a specialized audience, requiring technical expertise and leaving out crucial stakeholders. This results in missed insights, delayed decisions, and a limited understanding of their data's true potential.
+AlphaBeam CBI is an avant-garde Conversational Business Intelligence solution, the first of its kind, that reasync async defines data interaction by seamlessly helping business users to explore their data without having to rely on their tech teams every time. While traditional BI tools have empowered data exploration through dashboards and reports, they often cater to a specialized audience, requiring technical expertise and leaving out crucial stakeholders. This results in missed insights, delayed decisions, and a limited understanding of their data's true potential.
 
 To address this shortcoming in fostering a truly interactive and user-centric experience for non-technical users, AlphaBeam seamlessly blends conversational capabilities with advanced analytics, creating a symbiotic relationship between business users and their data.
 
@@ -10,7 +10,7 @@ At a glance, AlphaBeam offers businesses and organisations, in particular non-te
 These capabilities empower users to carry out the following:
 - **Conversational Inquiries:** Business users can ask questions about already existing dashboards in natural language, just as they would converse with a colleague. They could dig deeper into the data behind the visualisations, gaining a comprehensive understanding of trends and patterns.
 
-- **Comprehensive Metric Exploration:** Engage in a conversational dialogue to uncover insights about any metric or data point, regardless of whether it's currently displayed on the dashboard. AlphaBeam breaks users free from the constraints of pre-defined dashboards and enables them to delve into any aspect of their data that piques their curiosity, regardless of their technical background.
+- **Comprehensive Metric Exploration:** Engage in a conversational dialogue to uncover insights about any metric or data point, regardless of whether it's currently displayed on the dashboard. AlphaBeam breaks users free from the constraints of pre-async async defined dashboards and enables them to delve into any aspect of their data that piques their curiosity, regardless of their technical background.
 
 - **Visualisation on Demand:** AlphaBeam enables stakeholders to explore data interactively, receive accurate and insightful interpretations of visuals and data trends, and generate dynamic visualisations with specific data points for deeper understanding.
 
@@ -29,7 +29,7 @@ The Semantic Layer acts as a translator, bridging the gap between raw data and b
 The Metric Layer is an SQL implementation of the Semantic Layer. It houses the metrics and queries that are needed to fetch data from the source, tailored to the users' unique analytics needs. 
 
 ### iv. Assistants Layer
-The Assistants Layer leverages Gemini to automate the creation of metric queries. When a user asks a question for which the semantic layer shows that there is available data, but the metric required to fetch that data is not available, the Assistant Layers augments the Metric Layer through metric definition and query formulation, and the generated metric is stored in the Metric Layer for subsequent use. Further, the Assistats Layer houses custom functions that are needed to assist in the data retrieval process.
+The Assistants Layer leverages Gemini to automate the creation of metric queries. When a user asks a question for which the semantic layer shows that there is available data, but the metric required to fetch that data is not available, the Assistant Layers augments the Metric Layer through metric async async definition and query formulation, and the generated metric is stored in the Metric Layer for subsequent use. Further, the Assistats Layer houses custom functions that are needed to assist in the data retrieval process.
 
 ### v. Retrieval Layer
 The Retrieval Layer orchestrates Retrieval Augmented Generation (RAG) pipelines, through Llama-Index, to augment Gemini with contextual data. It is first used to transform the Semantic Layer into vector embeddings which are stored in a vector database. When a user asks a question, the Retrieval layer implements semantic search on these embeddings to determine if the question can be answered based on the business ontologies. Further, the Retrieval Layer is used to orchestrate data retrieval by implementing the queries that fetch relevant data from the source and augmenting Gemini with this retrieved data to generate a contextual response.
@@ -64,7 +64,7 @@ The data used in this PoC to demonstrate AlphaBeam's capabilities was obtained f
 These datasets were uploaded on BigQuery before dbt was connected to BigQuery to build the semantic layer and metric layer.
 
 ### ii. Building the Semantic Layer and Metric Layer
-Before building the semantic layer with dbt-metricflow, the raw data were modelled using dbt. These modelled datasets acted as the bedrock to the semantic layer where the necessary connections between these datasets were established using the necessary foreign and primary keys. In each semantic model where these relationships were established, we also defined the metrics that would manifest in our data warehouse. It is important to note that we didn't exhaust the metrics that could be defined from the data because we understood that we were building a proof of concept data warehouse. 
+Before building the semantic layer with dbt-metricflow, the raw data were modelled using dbt. These modelled datasets acted as the bedrock to the semantic layer where the necessary connections between these datasets were established using the necessary foreign and primary keys. In each semantic model where these relationships were established, we also async async defined the metrics that would manifest in our data warehouse. It is important to note that we didn't exhaust the metrics that could be async async defined from the data because we understood that we were building a proof of concept data warehouse. 
 
 Listed below are the metrics currently available:
 - `discount_amount_average`

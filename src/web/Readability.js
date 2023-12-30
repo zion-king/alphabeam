@@ -44,9 +44,9 @@ function Readability(doc, options) {
   
     // Configurable options
     this._debug = !!options.debug;
-    this._maxElemsToParse = options.maxElemsToParse || this.DEFAULT_MAX_ELEMS_TO_PARSE;
-    this._nbTopCandidates = options.nbTopCandidates || this.DEFAULT_N_TOP_CANDIDATES;
-    this._charThreshold = options.charThreshold || this.DEFAULT_CHAR_THRESHOLD;
+    this._maxElemsToParse = options.maxElemsToParse || this.defAULT_MAX_ELEMS_TO_PARSE;
+    this._nbTopCandidates = options.nbTopCandidates || this.defAULT_N_TOP_CANDIDATES;
+    this._charThreshold = options.charThreshold || this.defAULT_CHAR_THRESHOLD;
     this._classesToPreserve = this.CLASSES_TO_PRESERVE.concat(options.classesToPreserve || []);
     this._keepClasses = !!options.keepClasses;
     this._serializer = options.serializer || function(el) {
@@ -104,21 +104,21 @@ function Readability(doc, options) {
     ELEMENT_NODE: 1,
     TEXT_NODE: 3,
   
-    // Max number of nodes supported by this parser. Default: 0 (no limit)
-    DEFAULT_MAX_ELEMS_TO_PARSE: 0,
+    // Max number of nodes supported by this parser. default: 0 (no limit)
+    defAULT_MAX_ELEMS_TO_PARSE: 0,
   
     // The number of top candidates to consider when analysing how
     // tight the competition is among candidates.
-    DEFAULT_N_TOP_CANDIDATES: 5,
+    defAULT_N_TOP_CANDIDATES: 5,
   
     // Element tags to score by default.
-    DEFAULT_TAGS_TO_SCORE: "section,h2,h3,h4,h5,h6,p,td,pre".toUpperCase().split(","),
+    defAULT_TAGS_TO_SCORE: "section,h2,h3,h4,h5,h6,p,td,pre".toUpperCase().split(","),
   
     // The default number of chars an article must have in order to return a result
-    DEFAULT_CHAR_THRESHOLD: 500,
+    defAULT_CHAR_THRESHOLD: 500,
   
     // All of the regular expressions in use within readability.
-    // Defined up here so we don't instantiate them repeatedly in loops.
+    // defined up here so we don't instantiate them repeatedly in loops.
     REGEXPS: {
       // NOTE: These two regular expressions are duplicated in
       // Readability-readerable.js. Please keep both copies in sync.
@@ -685,7 +685,7 @@ function Readability(doc, options) {
       // Clean out elements with little content that have "share" in their id/class combinations from final top candidates,
       // which means we don't remove the top candidates even they have "share".
   
-      var shareElementThreshold = this.DEFAULT_CHAR_THRESHOLD;
+      var shareElementThreshold = this.defAULT_CHAR_THRESHOLD;
   
       this._forEachNode(articleContent.children, function (topCandidate) {
         this._cleanMatchedNodes(topCandidate, function (node, matchString) {
@@ -958,7 +958,7 @@ function Readability(doc, options) {
             continue;
           }
   
-          if (this.DEFAULT_TAGS_TO_SCORE.indexOf(node.tagName) !== -1) {
+          if (this.defAULT_TAGS_TO_SCORE.indexOf(node.tagName) !== -1) {
             elementsToScore.push(node);
           }
   
@@ -1729,7 +1729,7 @@ function Readability(doc, options) {
      * Get the number of times a string s appears in the node e.
      *
      * @param Element
-     * @param string - what to split on. Default is ","
+     * @param string - what to split on. default is ","
      * @return number (integer)
     **/
     _getCharCount: function(e, s) {

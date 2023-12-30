@@ -1,23 +1,16 @@
-import io
-import os
-import time
-import chromadb
-import tempfile
+import os,time,chromadb,tempfile
 import google.generativeai as genai
-from llama_index.llms import OpenAI, Gemini
+from llama_index.llms import Gemini
 from llama_index.memory import ChatMemoryBuffer
-from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext, StorageContext, PromptHelper, LLMPredictor, load_index_from_storage
-from llama_index.embeddings import OpenAIEmbedding, GeminiEmbedding
+from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext, StorageContext
+from llama_index.embeddings import GeminiEmbedding
 from llama_index.vector_stores import ChromaVectorStore
-from llama_index.vector_stores.google.generativeai import GoogleVectorStore, set_google_config, genai_extension as genaix
-from llama_index.indices.postprocessor import SentenceEmbeddingOptimizer, LLMRerank, CohereRerank, LongContextReorder
-from llama_index import download_loader
-from llama_index.schema import Document
-from llama_index.text_splitter import TokenTextSplitter
-from llama_index.node_parser import SimpleNodeParser
-from google.oauth2 import service_account
-from assistants.functions import *
-from embedding_utils import *
+from llama_index.vector_stores.google.generativeai import  genai_extension as genaix
+from llama_index.indices.postprocessor import LLMRerank, CohereRerank
+from src.assistants.functions import *
+from src.utils.embedding_utils import *
+from llama_index.utils import truncate_text
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -33,7 +26,7 @@ CHROMADB_HOST = "localhost"
 COHERE_RERANK_KEY = 'p8K3ASZaficAE1YlOh9dAY3x5Tkxa8sOmCRtJOtP'
 
 
-def get_index_from_vector_db(index_name):
+async def get_index_from_vector_db(index_name):
     
     try:
         # initialize client
@@ -79,7 +72,7 @@ def get_index_from_vector_db(index_name):
     print(f'Index retrieved from ChromaDB in {time.time() - start_time} seconds.')
     return index, doc_size
 
-def postprocessor_args(doc_size):
+async def postprocessor_args(doc_size):
     if doc_size<30:
         return None
     
@@ -90,7 +83,7 @@ def postprocessor_args(doc_size):
 
     # slower postprocessor
     embed_model = GeminiEmbedding(api_key=GOOGLE_API_KEY)
-    service_context = ServiceContext.from_defaults(llm=None, embed_model=embed_model, chunk_size=256, chunk_overlap=20) # use llama_index default MockLLM (faster)
+    service_context = ServiceContext.from_defaults(llm=None, embed_model=embed_model, chunk_size=256, chunk_overlap=20) # use llama_index async default MockLLM (faster)
 
     rank_postprocessor = LLMRerank(
         choice_batch_size=10, top_n=100,
@@ -111,10 +104,10 @@ def postprocessor_args(doc_size):
     return node_postprocessors
 
 
-def parse_choice_select_answer_fn(
+async def parse_choice_select_answer_fn(
     answer: str, num_choices: int, raise_error: bool = False
 ):
-    """Default parse choice select answer function."""
+    """async default parse choice select answer function."""
     answer_lines = answer.split("\n")
     # print(answer_lines)
     answer_nums = []
@@ -140,9 +133,8 @@ def parse_choice_select_answer_fn(
     return answer_nums, answer_relevances
 
 
-def get_formatted_sources(response, length=100, trim_text=True) -> str:
+async def get_formatted_sources(response, length=100, trim_text=True) -> str:
     """Get formatted sources text."""
-    from llama_index.utils import truncate_text
     texts = []
     for source_node in response.source_nodes:
         fmt_text_chunk = source_node.node.get_content()
@@ -155,7 +147,7 @@ def get_formatted_sources(response, length=100, trim_text=True) -> str:
     return "\n\n".join(texts)
 
 
-def semantic_prompt_style(): 
+async def semantic_prompt_style(): 
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for conversational business intelligence.
     Your task is to use the provided knowledege base, containing semantic models of a business dataset,
@@ -166,7 +158,7 @@ def semantic_prompt_style():
     return prompt_header   
 
 
-def query_gen_prompt_style(): 
+async def query_gen_prompt_style(): 
 
     with open("./assistants/mf_few_shot.txt", "r") as f:
         # print(file)
@@ -206,7 +198,7 @@ def query_gen_prompt_style():
 
     return prompt_header   
 
-def retrieved_data_prompt_style(llm_query_input):
+async def retrieved_data_prompt_style(llm_query_input):
 
     prompt_header = f"""Your name is Alpha, a highly intelligent system for 
     conversational business intelligence. Your task is to provide data analysis and interpretation 
@@ -225,15 +217,15 @@ def retrieved_data_prompt_style(llm_query_input):
     return prompt_header   
 
 
-def answer_query_stream(query, index_name, prompt_style):
+async def answer_query_stream(query, index_name, prompt_style):
 
-    index, doc_size = get_index_from_vector_db(index_name)
+    index, doc_size = await get_index_from_vector_db(index_name)
 
     if index is None:
         response = "Requested information not found"
         return response
     else:
-        node_postprocessors = postprocessor_args(doc_size)
+        node_postprocessors = await postprocessor_args(doc_size)
         similarity_top_k = 200 if doc_size>200 else doc_size
         chat_engine = index.as_chat_engine(chat_mode="context", 
                                             # memory=chat_history, # shouldn't retain chat history here
@@ -254,10 +246,10 @@ def answer_query_stream(query, index_name, prompt_style):
             return f'''{response.response}'''
 
 
-def fetch_data(user_query, llm_query_input, chat_history):
+async def fetch_data(user_query, llm_query_input, chat_history):
     
     with tempfile.TemporaryDirectory() as temp_dir:
-        query_output_dir = llm_run_query_cmd(llm_query_input, temp_dir)
+        query_output_dir = await llm_run_query_cmd(llm_query_input, temp_dir)
 
         if query_output_dir is None:
             return "Could not fetch data from the database. Please try again and if the problem persists, inform your IT team."
@@ -294,7 +286,7 @@ def fetch_data(user_query, llm_query_input, chat_history):
         print('Starting response stream...\n...........................\n...........................')
         return response.response
 
-def init_chat_history():
+async def init_chat_history():
     new_conversation_state = ChatMemoryBuffer.from_defaults(token_limit=50000)
     return new_conversation_state
 

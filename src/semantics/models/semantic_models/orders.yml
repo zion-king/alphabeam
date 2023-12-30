@@ -1,6 +1,6 @@
 semantic_models:
   - name: orders
-    defaults:
+    async async defaults:
       agg_time_dimension: order_date
     description: This table is at the orders grain with one row per order
     model: ref('orders')
