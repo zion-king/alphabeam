@@ -22,6 +22,8 @@ async def startup():
     db = await chroma_dbconn()
     if isinstance(db, dict):
         print(db)
+    else:
+        print("Database::connected")
     print("Alphabeam::Started")
 
 

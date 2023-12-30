@@ -8,3 +8,7 @@
 [32mINFO[0m:     [30-12-2023 15:57:05] ::1:61450 - "POST /api/v1/collections?tenant=default_tenant&database=default_database HTTP/1.1" 200
 [32mINFO[0m:     [30-12-2023 16:31:24] ::1:61227 - "GET /api/v1/tenants/default_tenant HTTP/1.1" 200
 [32mINFO[0m:     [30-12-2023 16:31:24] ::1:61227 - "GET /api/v1/databases/default_database?tenant=default_tenant HTTP/1.1" 200
+[32mINFO[0m:     [30-12-2023 16:38:19] Shutting down
+[32mINFO[0m:     [30-12-2023 16:38:20] Waiting for application shutdown.
+[32mINFO[0m:     [30-12-2023 16:38:20] Application shutdown complete.
+[32mINFO[0m:     [30-12-2023 16:38:20] Finished server process [[36m9512[0m]
