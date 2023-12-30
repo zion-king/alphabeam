@@ -92,6 +92,7 @@ def llm_run_query_cmd(llm_query_input: str, temp_dir):
         return temp_dir
                                 
     except Exception as e:
+        print(e)
         print("Lots of encoding errors!!!")
         return None
 

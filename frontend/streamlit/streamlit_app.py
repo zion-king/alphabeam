@@ -22,7 +22,7 @@ with st.sidebar:
     # st.header("AlphaBeam Chat Engine")
     # Function to send user query to the Flask API
     def send_query(user_query):
-        api_url = "http://34.69.102.150/retrieval"  # Replace with your actual Flask API URL
+        api_url = "http://35.223.88.37/retrieval"  # Replace with your actual Flask API URL
         response = requests.post(api_url, json={"projectName": "semantic_layer_4", 
                                                 "query": user_query,
                                                 "reset_chat": True})
